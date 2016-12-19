@@ -23,11 +23,11 @@ int main() {
     int x, y;
     for(int i = 0; i < size; i++) {
         cin >> x >> y;
-        if(a[y-x+7] || b[x+y] || c[x] || d[y]) {
+        if(a[y-x+size-1] || b[x+y] || c[x] || d[y]) {
             cout << "INCORRECT" << endl;
             return 0;
         }
-        a[y - x + 7] = true;
+        a[y - x + size-1] = true;
         b[x + y] = true;
         c[x] = true;
         d[y] = true;
