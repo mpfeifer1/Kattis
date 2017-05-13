@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <set>
 
 using namespace std;
 
@@ -22,7 +22,7 @@ int main() {
     int n;
     int i = 1;
     while(cin >> n && n != 0) {
-        unordered_multimap<string, int> animals;
+        multiset<string> animals;
         vector<string> names;
 
         cin.ignore();
@@ -34,7 +34,7 @@ int main() {
             if(animals.count(name) == 0) {
                 names.push_back(name);
             }
-            animals.insert({name, 0});
+            animals.insert(name);
         }
 
         sort(names.begin(), names.end());
