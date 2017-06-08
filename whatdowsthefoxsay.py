@@ -5,15 +5,13 @@ def main():
 
     while n > 0:
         n -= 1
-        words = sys.stdin.readline()
-        words = words.split()
+        words = sys.stdin.readline().split()
 
         while True:
             line = sys.stdin.readline()
             if line == 'what does the fox say?\n':
                 break
-            word = line.split()
-            word = word[-1]
+            word = line.split()[-1]
             words = [i for i in words if i != word]
 
         for word in words:
