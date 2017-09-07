@@ -12,14 +12,14 @@ int getBitsFromYear(int year) {
 
 int main() {
     unordered_map<int, string> answers;
-    answers[2] = "3";
-    answers[3] = "5";
-    answers[4] = "8";
-    answers[5] = "12";
-    answers[6] = "20";
-    answers[7] = "34";
-    answers[8] = "57";
-    answers[9] = "98";
+    answers[2]  = "3";
+    answers[3]  = "5";
+    answers[4]  = "8";
+    answers[5]  = "12";
+    answers[6]  = "20";
+    answers[7]  = "34";
+    answers[8]  = "57";
+    answers[9]  = "98";
     answers[10] = "170";
     answers[11] = "300";
     answers[12] = "536";
