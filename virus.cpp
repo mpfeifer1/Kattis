@@ -1,25 +1,32 @@
 #include <iostream>
+#include <list>
 
 using namespace std;
 
 int main() {
-    string s1, s2;
-    cin >> s1 >> s2;
+    list<char> l1, l2;
 
-    while(!s1.empty() && !s2.empty() && s1[0] == s2[0]) {
-        s1.erase(0,1);
-        s2.erase(0,1);
+    // Take in Data
+    char c;
+    while(cin.get(c) && c != '\n') {
+        l1.push_back(c);
+    }
+    while(cin.get(c) && c != '\n') {
+        l2.push_back(c);
     }
 
-    int l1 = s1.length() - 1;
-    int l2 = s2.length() - 1;
-
-    while(!s1.empty() && !s2.empty() && s1[l1] == s2[l2]) {
-        s1.erase(l1,1);
-        s2.erase(l2,1);
-        l1--;
-        l2--;
+    // Remove beginning items
+    while(!l1.empty() && !l2.empty() && l1.front() == l2.front()) {
+        l1.pop_front();
+        l2.pop_front();
     }
 
-    cout << s2.length() << endl;
+    // Remove ending items
+    while(!l1.empty() && !l2.empty() && l1.back() == l2.back()) {
+        l1.pop_back();
+        l2.pop_back();
+    }
+
+    // Print answer
+    cout << l2.size() << endl;
 }
