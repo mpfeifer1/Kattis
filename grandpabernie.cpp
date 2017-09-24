@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
@@ -11,7 +12,7 @@ int main() {
     cin >> n;
 
     unordered_map<string, vector<int>> vacations;
-    vector<string> destinations;
+    unordered_set<string> destinations;
 
     for(int i = 0; i < n; i++) {
         string dest;
@@ -20,7 +21,7 @@ int main() {
         int year;
         cin >> year;
 
-        destinations.push_back(dest);
+        destinations.insert(dest);
 
         if(vacations.count(dest) < 1) {
             vector<int> v;
