@@ -93,7 +93,7 @@ bool solve(deque<char> pattern, deque<char> word) {
     for(auto i : v) {
         // If we're going to overstep, quit
         if(start >= s.size()) {
-            return true;
+            return false;
         }
 
         // Find the next match
