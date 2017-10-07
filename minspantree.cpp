@@ -1,82 +1,99 @@
-#include <unordered_map>
+#include <algorithm>
 #include <iostream>
-#include <queue>
+#include <vector>
 
 using namespace std;
 
+struct edge {
+    int n1;
+    int n2;
+    int w;
+};
+
+bool cmp(edge lhs, edge rhs) {
+    return lhs.w < rhs.w;
+}
+
+bool cmp2(edge lhs, edge rhs) {
+    if(lhs.n1 == rhs.n1) {
+        return lhs.n2 < rhs.n2;
+    }
+    return lhs.n1 < rhs.n1;
+}
+
+int find(vector<int>& disjoint, int n) {
+    if(disjoint[n] == -1) {
+        return n;
+    }
+
+    int tmp = find(disjoint, disjoint[n]);
+    disjoint[n] = tmp;
+    return tmp;
+}
+
+void join(vector<int>& disjoint, int n1, int n2) {
+    n1 = find(disjoint, n1);
+    n2 = find(disjoint, n2);
+
+    disjoint[n1] = n2;
+}
+
 int main() {
-    int v, e;
-    cin >> v >> e;
-    while(v != 0 && e != 0) {
-        // Map, int, node1, node2
-        unordered_map<int, pair<int, int>> edges;
-        // Sort all connections by size
-        priority_queue<int, vector<int>, greater<int>> lengths;
-
-        // Sor all connections into the data structures
-        for(int i = 0; i < e; i++) {
-            int n1, n2, dist;
-            cin >> n1 >> n2 >> dist;
-
-            edges.insert({dist, {n1, n2}});
-            lengths.push(dist);
+    int n, m;
+    while(cin >> n && cin >> m && n != 0) {
+        // Read in edges
+        vector<edge> v;
+        for(int i = 0; i < m; i++) {
+            edge e;
+            cin >> e.n1 >> e.n2 >> e.w;
+            v.push_back(e);
         }
 
-        // Keep track of all saved connections
-        int totalDist = 0;
-        int connections = 0;
+        // Sort edges by weight
+        sort(v.begin(), v.end(), cmp);
 
-        // Create a VxV adjacency matrix
-        vector<vector<int>> adj;
-        adj.resize(v, 0);
-        for(int i = 0; i < v; i++) {
-            adj[i].resize(v, 0);
-        }
+        // Set up used node array
+        vector<int> disjoint;
+        disjoint.resize(n, -1);
 
-        // For each length, add to min spanning tree
-        while(!lengths.empty()) {
-            // Get Length
-            int dist = lengths.top();
-            lengths.pop();
+        // Set up array of edges to keep and total weight
+        vector<edge> keep;
+        int weight = 0;
 
-            // Edges contains all connections of a given length
-            auto edges = lengths.equal_range(dist);
-
-            // For each pair in edges
-            for(auto p : edges) {
-                // Try the edge
-                adj[p->first][p->second] = 1;
-                adj[p->second][p->first] = 1;
-
-                // Check for a cycle
-                if(!hasCycle(adj)) {
-                    // If edge OK, add it, connections++
-                    connections++;
-                    totalDist += dist;
-                }
-                else {
-                    // Otherwise, remove
-                    adj[p->first][p->second] = 0;
-                    adj[p->second][p->first] = 0;
-
-                }
-
-
+        // Try to add each edge
+        for(auto i : v) {
+            // If they have the same parent, don't allow a cycle
+            int p1 = find(disjoint, i.n1);
+            int p2 = find(disjoint, i.n2);
+            if(p1 == p2) {
+                continue;
             }
 
-            // If there are enough connections,
-            if(connections >= v-1) {
-                // Print all the data
-                // break
-            }
-
-            // Temporary
-            cout << "Length: " << dist << endl;
+            // Otherwise, add
+            join(disjoint, i.n1, i.n2);
+            weight += i.w;
+            keep.push_back(i);
         }
 
+        // Make sure spanning tree is connected
+        int trees = 0;
+        for(auto i : disjoint) {
+            if(i < 0) {
+                trees++;
+            }
+        }
+        if(trees > 1) {
+            cout << "Impossible" << endl;
+            continue;
+        }
 
-        cout << endl << endl;
+        // Print total weight
+        cout << weight << endl;
 
-        cin >> v >> e;
+        // Print all of the edges
+        sort(keep.begin(), keep.end(), cmp2);
+        for(auto i : keep) {
+            cout << i.n1 << " " << i.n2 << endl;
+        }
     }
 }
