@@ -44,8 +44,16 @@ int main() {
         // Read in edges
         vector<edge> v;
         for(int i = 0; i < m; i++) {
+            // Read in
             edge e;
             cin >> e.n1 >> e.n2 >> e.w;
+
+            // Make sure edges in correct format
+            if(e.n1 > e.n2) {
+                swap(e.n1, e.n2);
+            }
+
+            // Add
             v.push_back(e);
         }
 
