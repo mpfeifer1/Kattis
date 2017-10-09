@@ -52,7 +52,8 @@ int main() {
             }
             else if(v[i] > v[t[l-1]]) {
                 r[i] = t[l-1];
-                t[l++] = i;
+                t[l] = i;
+                l++;
             }
             else {
                 int pos = search(v, t, -1, l-1, v[i]);
@@ -70,13 +71,6 @@ int main() {
             ans.push_back(i);
         }
         reverse(ans.begin(), ans.end());
-
-        // Bug with 1-length LIS
-        if(l == 1) {
-            while(ans.size() > 1) {
-                ans.pop_back();
-            }
-        }
 
         // Print LIS
         for(auto i : ans) {
