@@ -17,44 +17,37 @@ for line in fileinput.input():
 
     # Calculate the value of a string
     if line[0] == "calc":
-        # Check that the first word is in the dictionary
-        if line[1] not in words:
-            for i in line[1:]:
-                print(i, end=' ')
-            print('unknown')
-            continue
+        # Split into words and operators
+        line = line[1:]
+        var = line[::2]
+        ops = line[1::2]
 
-        # Get the first word out
-        total = int(words[line[1]])
-        output = line[1:]
-        line = line[2:]
-
-        # Check if any numbers in the LHS are unknown
+        # Keep track of whether answer is unknown
         unknown = False
-        for i in range(1, len(line), 2):
-            if line[i] not in words:
+
+        # Check all vars exist
+        for variable in var:
+            if variable not in words:
                 unknown = True
 
-        # If any are, print that they are unknown
-        if unknown:
-            for i in output:
-                print(i, end=' ')
-            print('unknown')
-            continue
+        # Calculate total if they do
+        if not unknown:
+            # Calculate total
+            total = words[var[0]]
+            for i in range(len(ops)-1):
+                if ops[i] == '+':
+                    total += words[var[i+1]]
+                if ops[i] == '-':
+                    total -= words[var[i+1]]
 
-        # Otherwise calculate the total
-        for i in range(0, len(line), 2):
-            if line[i] == '+':
-                total += int(words[line[i+1]])
-            if line[i] == '-':
-                total -= int(words[line[i+1]])
+            # Check answer exists
+            if total not in other:
+                unknown = True
 
-        # Then, print it out
-        for i in output:
+        # Print answer
+        for i in line:
             print(i, end=' ')
+        if unknown:
+            print('unknown')
         else:
-            if total in other:
-                print(other[total])
-            else:
-                print('unknown')
-
+            print(other[total])
