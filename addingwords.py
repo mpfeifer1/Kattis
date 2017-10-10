@@ -12,8 +12,19 @@ for line in fileinput.input():
 
     # Set insert the word into both dictionaries
     if line[0] == "def":
-        words[line[1]] = int(line[2])
-        other[int(line[2])] = line[1]
+        # Get new var names
+        word = line[1]
+        value = int(line[2])
+
+        # Remove any existing old definitions
+        if word in words:
+            oldvalue = words[word]
+            other.pop(oldvalue, None)
+
+
+        # Add new definitions
+        words[word] = value
+        other[value] = word
 
     # Calculate the value of a string
     if line[0] == "calc":
