@@ -20,6 +20,14 @@ def main():
         b1 = int(b1)
         b2 = int(b2)
 
+        # Make positive
+        if b1 < 0:
+            t1 *= -1
+            b1 *= -1
+        if b2 < 0:
+            t2 *= -1
+            b2 *= -1
+
         # Set up top and bottom
         t = None
         b = None
