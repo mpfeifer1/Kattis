@@ -3,15 +3,17 @@
 using namespace std;
 
 int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
     int cases;
     cin >> cases;
 
-    for(int i = 0; i < cases; i++) {
-        int cities, pilots;
+    int cities, pilots, a, b, i, j;
+    for(i = 0; i < cases; i++) {
         cin >> cities >> pilots;
 
-        for(int j = 0; j < pilots; j++) {
-            int a, b;
+        for(j = 0; j < pilots; j++) {
             cin >> a >> b;
         }
 
