@@ -4,6 +4,9 @@
 using namespace std;
 
 int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
     int n;
     cin >> n;
 
@@ -11,18 +14,20 @@ int main() {
         int size;
         cin >> size;
         vector<int> v;
-        int incorrect = 0;
 
         for(int j = 0; j < size; j++) {
             int temp;
             cin >> temp;
             v.push_back(temp);
-            int s = v.size();
-            if(v[s-1] < v[s-2]) {
-                incorrect++;
+        }
+
+        int minfound = 0;
+        for(auto i : v) {
+            if(i == minfound+1) {
+                minfound++;
             }
         }
 
-        cout << incorrect << endl;
+        cout << size - minfound << endl;
     }
 }
