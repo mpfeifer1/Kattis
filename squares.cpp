@@ -60,6 +60,10 @@ int main() {
     vector<line> v(n);
     for(auto& i : v) {
         cin >> i.x1 >> i.y1 >> i.x2 >> i.y2;
+        if(i.x1 < i.x2) {
+            swap(i.x1, i.x2);
+            swap(i.y1, i.y2);
+        }
     }
 
     unordered_map<string, vector<line>> lines;
@@ -170,6 +174,10 @@ int main() {
                 int2.push_back(j.x1);
             }
 
+            // Remove duplicates
+            int1.resize(distance(int1.begin(), unique(int1.begin(), int1.end())));
+            int2.resize(distance(int2.begin(), unique(int2.begin(), int2.end())));
+
             // Get all the distances
             for(int k = 0; k < int1.size(); k++) {
                 for(int j = k+1; j < int1.size(); j++) {
@@ -221,6 +229,11 @@ int main() {
             p = reduce(p);
             i2.push_back(p);
         }
+
+        // Remove duplicates
+        i1.resize(distance(i1.begin(), unique(i1.begin(), i1.end())));
+        i2.resize(distance(i2.begin(), unique(i2.begin(), i2.end())));
+
 
         // Get all the distances
         for(int k = 0; k < i1.size(); k++) {
