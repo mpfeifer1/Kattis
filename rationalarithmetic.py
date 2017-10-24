@@ -59,13 +59,9 @@ def main():
         # Simplify
         div = fractions.gcd(t, b)
         while div != 1:
-            t /= div
-            b /= div
+            t //= div
+            b //= div
             div = fractions.gcd(t, b)
-
-        # Make ints
-        t = int(t)
-        b = int(b)
 
         # Make positive
         if b < 0:
