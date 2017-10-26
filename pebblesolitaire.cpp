@@ -46,6 +46,7 @@ int solve(unordered_map<string, int>& memo, string s) {
         }
     }
 
+    memo[s] = dots;
     return dots;
 }
 
