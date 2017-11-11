@@ -1,11 +1,15 @@
+#include <unordered_set>
 #include <algorithm>
 #include <iostream>
 #include <valarray>
 #include <complex>
+#include <vector>
 
 using namespace std;
 
-void nextpow(int& n) {
+typedef long long ll;
+
+void nextpow(ll& n) {
     n--;
     n |= n >> 1;
     n |= n >> 2;
@@ -16,7 +20,7 @@ void nextpow(int& n) {
 }
 
 void fft(valarray<complex<double>>& x) {
-    int s = x.size();
+    ll s = x.size();
 
     if(s <= 1) {
         return;
@@ -28,7 +32,7 @@ void fft(valarray<complex<double>>& x) {
     fft(even);
     fft(odd);
 
-    for(int i = 0; i < s/2; i++) {
+    for(ll i = 0; i < s/2; i++) {
         complex<double> t = polar(1.0, -2.0 * M_PI * i / s) * odd[i];
         x[i]     = even[i] + t;
         x[i+s/2] = even[i] - t;
@@ -43,17 +47,59 @@ void ifft(valarray<complex<double>>& x) {
 }
 
 int main() {
-    valarray<complex<double>> s1;
-    vector<int> v1;
+    // Set up constants
+    ll big = 200000;
+    nextpow(big);
 
-    int size1;
+    // Set up storage
+    vector<ll> v1, v2;
+    unordered_set<ll> achievable;
+
+    // Read in list of powers
+    ll size1;
     cin >> size1;
-    for(int i = 0; i < size1; i++) {
-        int n;
+    for(ll i = 0; i < size1; i++) {
+        ll n;
         cin >> n;
-        v1.push(n);
+        v1.push_back(n);
+        achievable.insert(n);
     }
 
-    int size2;
+    // Read in list of goals
+    ll size2;
     cin >> size2;
+    for(ll i = 0; i < size2; i++) {
+        ll n;
+        cin >> n;
+        v2.push_back(n);
+    }
+
+    // Create FFT-compatible list
+    valarray<complex<double>> s1;
+    complex<double> empty(0, 0);
+    s1.resize(big, empty);
+    for(auto i : v1) {
+        complex<double> temp(1, 0);
+        s1[i] = temp;
+    }
+
+    // Run the FFT
+    fft(s1);
+    for(auto& i : s1) {
+        i *= i;
+    }
+    ifft(s1);
+
+    // Count the total number of achievable goals
+    ll count = 0;
+    for(auto i : v2) {
+        //cout << "Checking " << i << endl;
+        if(s1[i].real() > .5 || achievable.count(i) > 0) {
+            //cout << "Found " << i << endl;
+            count++;
+        }
+    }
+
+    // Print answer
+    cout << count << endl;
 }
