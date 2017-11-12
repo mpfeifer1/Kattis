@@ -50,6 +50,7 @@ int main() {
     // Set up constants
     ll big = 200000;
     nextpow(big);
+    big *= 2;
 
     // Set up storage
     vector<ll> v1, v2;
@@ -85,6 +86,7 @@ int main() {
 
     // Run the FFT
     fft(s1);
+
     for(auto& i : s1) {
         i *= i;
     }
