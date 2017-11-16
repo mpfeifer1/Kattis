@@ -6,12 +6,14 @@ using namespace std;
 typedef long long ll;
 ll inf = (ll)1 << 55;
 
+// Defind road/flight
 struct edge {
     ll w;
     ll dest;
     bool flight;
 };
 
+// Define city
 struct node {
     ll dist;
     ll fdist;
@@ -20,6 +22,7 @@ struct node {
 };
 
 int main() {
+    // Read in input
     int n, m, f, s, t;
     cin >> n >> m >> f >> s >> t;
 
@@ -29,6 +32,7 @@ int main() {
     empty.fdist = inf;
     vector<node> nodes(n, empty);
 
+    // Read in roads
     for(int i = 0; i < m; i++) {
         ll n1, n2, w;
         cin >> n1 >> n2 >> w;
@@ -37,6 +41,7 @@ int main() {
         nodes[n2].neighbors.push_back({w,n1,false});
     }
 
+    // Read in flights
     for(int i = 0; i < f; i++) {
         ll n1, n2;
         cin >> n1 >> n2;
@@ -44,10 +49,12 @@ int main() {
         nodes[n1].neighbors.push_back({0,n2,true});
     }
 
+    // Prepare for Dijkstra's
     priority_queue<pair<ll,ll>> q;
     nodes[s].dist = 0;
     q.push({0,s});
 
+    // Run Dijkstra's
     while(!q.empty()) {
         ll curr = q.top().second;
         q.pop();
@@ -64,29 +71,28 @@ int main() {
 
             // If it's a road there
             else {
-                bool add1 = false, add2 = false;
+                bool add = false;
 
                 // Update path using road->road
                 if(nodes[curr].dist + i.w < nodes[i.dest].dist) {
                     nodes[i.dest].dist = nodes[curr].dist + i.w;
-                    add1 = true;
+                    add = true;
                 }
 
                 // Update path using flight->flight
                 if(nodes[curr].fdist + i.w < nodes[i.dest].fdist) {
                     nodes[i.dest].fdist = nodes[curr].fdist + i.w;
-                    add2 = true;
+                    add = true;
                 }
 
-                if(add2) {
-                    q.push({0,i.dest});
-                }
-                else if(add1) {
+                // Add to queue
+                if(add) {
                     q.push({i.w,i.dest});
                 }
             }
         }
     }
 
+    // Print answer
     cout << min(nodes[t].fdist, nodes[t].dist) << endl;
 }
