@@ -2,32 +2,49 @@
 
 using namespace std;
 
+int inf = 1 << 30;
+
 int main() {
-    int a, b, c;
-    vector<int> v;
-    cin >> a;
-    for(int i = 0; i < a; i++) {
-        cin >> b;
-        v.push_back(b);
+    int maxv = 2000006;
+
+    vector<int> dp(maxv, inf);
+    vector<int> greedy(maxv, inf);
+
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for(auto& i : a) {
+        cin >> i;
     }
+    sort(a.begin(), a.end());
 
-    for(int i = 1; i < a; i++) {
-        if(v[i] < 2 * v[i-1]){
-            int t = 2 * v[i-1];
-            int count = 0;
-            for(int j = v.size()-1; j >= 0; j--) {
-                while(t-v[j] >= 0) {
-                    t -= v[j];
-                    count++;
-                }
-            }
+    dp[0] = 0;
+    greedy[0] = 0;
 
-            if(count > 2) {
-                cout << "non-canonical" << endl;
-                return 0;
-            }
+    int ptr = 0;
+    bool works = true;
+
+    for(int i = 1; i < maxv; i++) {
+        while(ptr < n-1 && a[ptr+1] <= i) {
+            ptr++;
+        }
+
+        greedy[i] = greedy[i - a[ptr]] + 1;
+
+        for(int j = 0; j < n && a[j] <= i; j++) {
+            dp[i] = min(dp[i], dp[i - a[j]] + 1);
+        }
+
+        if(greedy[i] != dp[i]) {
+            works = false;
+            break;
         }
     }
-    cout << "canonical" << endl;
 
+    if(works) {
+        cout << "canonical" << endl;
+    }
+    else {
+        cout << "non-canonical" << endl;
+    }
 }
