@@ -47,6 +47,9 @@ void dfs2(vector<vector<int>>& adj, unordered_set<int>& vis, stack<int>& r, vect
 }
 
 int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
     int cases;
     cin >> cases;
 
