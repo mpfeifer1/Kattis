@@ -1,22 +1,24 @@
-#include <iostream>
-#include <deque>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 int main() {
-    char input;
-    deque<char> q;
-    while(cin >> input) {
-        if(input == '<') {
-            q.pop_back();
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    string s;
+    cin >> s;
+
+    string ans;
+
+    for(auto i : s) {
+        if(i == '<') {
+            ans.pop_back();
         }
         else {
-            q.push_back(input);
+            ans.push_back(i);
         }
     }
-    while(!q.empty()) {
-        cout << q.front();
-        q.pop_front();
-    }
-    cout << endl;
+
+    cout << ans << endl;
 }
