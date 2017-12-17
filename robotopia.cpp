@@ -13,8 +13,6 @@ int main()
     int problems;
     cin >> problems;
     for(int z = 0; z < problems; z++) {
-        int input[6] = {0};
-        //cin >> input[0] >> input[1] >> input[2] >> input[3] >> input[4] >> input[5];
         int L1, A1, L2, A2, LT, AT;
         cin >> L1 >> A1 >> L2 >> A2 >> LT >> AT;
         int solved = 0;
@@ -37,6 +35,6 @@ int main()
             cout << ones << " " << twos << endl;
         }
     }
-    
+
     return 0;
 }
