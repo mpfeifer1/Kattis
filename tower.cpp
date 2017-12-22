@@ -185,6 +185,9 @@ ll solve(unordered_map<ll,vector<ll>>& adj, vector<ll>& nodes) {
 }
 
 int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
     ll n;
     cin >> n;
 
