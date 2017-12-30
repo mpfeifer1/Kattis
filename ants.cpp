@@ -1,50 +1,31 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 
 using namespace std;
 
 int main() {
-    int times;
-    cin >> times;
-    for(int i = 0; i < times; i++) {
-        // Read in ants
-        int l, ants;
-        cin >> l >> ants;
-        vector<int> a;
-        for(int i = 0; i < ants; i++) {
-            int ant;
-            cin >> ant;
-            a.push_back(ant);
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int cases;
+    cin >> cases;
+
+    while(cases--) {
+        int n, m;
+        cin >> n >> m;
+
+        vector<int> v(m);
+        for(auto& i : v) {
+            cin >> i;
         }
 
-        // Sort Ants
-        sort(a.begin(), a.end());
+        int lo = min(v[0], n-v[0]);
+        int hi = max(v[0], n-v[0]);
 
-        // Find Center Ant
-        double center = 10000000;
-        int centerA = 0;
-        for(int i = 0; i < ants; i++) {
-            if(abs(a[i] - l/2) < center) {
-                center = abs(a[i] - l/2);
-                centerA = i; 
-            }
+        for(auto i : v) {
+            lo = max(lo, min(i, n-i));
+            hi = max(hi, max(i, n-i));
         }
 
-        // Print minimum distance for center ant
-        if(a[centerA] < l-a[centerA]) {
-            cout << a[centerA] << " ";
-        }
-        else {
-            cout << l-a[centerA] << " ";
-        }
-
-        // Calculate length of board - ant closest to end
-        if(l-a[0] < a[ants-1]) {
-            cout << a[ants-1] << endl;
-        }
-        else {
-            cout << l-a[0] << endl;
-        }
+        cout << lo << " " << hi << endl;
     }
 }
