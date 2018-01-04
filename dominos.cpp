@@ -98,7 +98,7 @@ int main() {
             dfs2(adj2, vis, recent, dis, curr);
         }
 
-        // Build Metagraph
+        // Build "Metagraph"
         for(int i = 0; i < dis.size(); i++) {
             deg[find(dis, i)] = 0;
         }
