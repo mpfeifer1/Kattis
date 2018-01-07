@@ -8,9 +8,9 @@ using namespace __gnu_pbds;
 typedef long long ll;
 ll inf = (ll)1 << 61;
 
-template<class TIn, class TOut>
+template<class TIn>
 using indexed_set = tree<
-        TIn, TOut, less<TIn>,
+        TIn, null_type, less<TIn>,
         rb_tree_tag, tree_order_statistics_node_update>;
 
 int main() {
@@ -31,7 +31,7 @@ int main() {
         i -= p;
     }
 
-    indexed_set<pair<ll,ll>, null_type> s;
+    indexed_set<pair<ll,ll>> s;
     s.insert({0,-1});
 
     ll sum = 0;
