@@ -3,7 +3,7 @@
 
 using namespace std;
 
-int setfind(int a, vector<int>& v) {
+int setfind(int a, int* v) {
     if(v[a] < 0) {
         return a;
     }
@@ -12,45 +12,76 @@ int setfind(int a, vector<int>& v) {
     return v[a];
 }
 
-void setunion(int a, int b, vector<int>& v) {
-    int tempa = setfind(a, v);
-    int tempb = setfind(b, v);
+void setunion(int a, int b, int* v) {
+    a = setfind(a, v);
+    b = setfind(b, v);
 
     // Same number
-    if(tempa == tempb) {
+    if(a == b) {
         return;
     }
 
-    // If both representative, make b point to a
-    if(v[tempa] < 0 && v[tempb] < 0) {
-        v[tempb] = tempa;
+    if(v[a] == v[b]) {
+        v[a] += v[b];
+        v[b] = a;
         return;
     }
 
-    // B representative
-    if(v[tempa] >= 0 && v[tempb] < 0) {
-        v[tempa] = tempb;
+    if(v[a] > v[b]) {
+        v[b] += v[a];
+        v[a] = b;
         return;
     }
 
-    // A representative
-    if(v[tempa] < 0 && v[tempb] >= 0) {
-        v[tempb] = tempa;
+    if(v[a] < v[b]) {
+        v[a] += v[b];
+        v[b] = a;
         return;
     }
 }
 
-int main() {
-    int m, n;
-    cin >> m >> n;
+long long int readint(){
+    char r;
+    bool start=false,neg=false;
+    long long int ret=0;
+    while(true){
+        r=getchar();
+        if((r-'0'<0 || r-'0'>9) && r!='-' && !start){
+            continue;
+        }
+        if((r-'0'<0 || r-'0'>9) && r!='-' && start){
+            break;
+        }
+        if(start)ret*=10;
+        start=true;
+        if(r=='-')neg=true;
+        else ret+=r-'0';
+    }
+    if(!neg)
+        return ret;
+    else
+        return -ret;
+}
 
-    vector<int> v;
-    v.resize(m+1, -1);
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+
+    int m, n;
+    m = readint();
+    n = readint();
+
+    int v[m+1];
+    for(int i= 0; i <= m; i++) {
+        v[i] = -1;
+    }
 
     for(int i = 0; i < n; i++) {
         char c;
+        c = getchar();
         int q1, q2;
-        cin >> c >> q1 >> q2;
+        q1 = readint();
+        q2 = readint();
 
         if(c == '?') {
             if(setfind(q1, v) == setfind(q2, v)) {
