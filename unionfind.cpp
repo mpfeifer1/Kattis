@@ -40,10 +40,10 @@ void setunion(int a, int b, int* v) {
     }
 }
 
-long long int readint(){
+void readint(int& ret){
+    ret = 0;
     char r;
     bool start=false,neg=false;
-    long long int ret=0;
     while(true){
         r=getchar();
         if((r-'0'<0 || r-'0'>9) && r!='-' && !start){
@@ -57,19 +57,35 @@ long long int readint(){
         if(r=='-')neg=true;
         else ret+=r-'0';
     }
-    if(!neg)
-        return ret;
-    else
-        return -ret;
+    if(neg) ret *= -1;
 }
+
+//void readint(long long& ret){
+//    char r;
+//    bool start=false,neg=false;
+//    while(true){
+//        r=getchar();
+//        if((r-'0'<0 || r-'0'>9) && r!='-' && !start){
+//            continue;
+//        }
+//        if((r-'0'<0 || r-'0'>9) && r!='-' && start){
+//            break;
+//        }
+//        if(start)ret*=10;
+//        start=true;
+//        if(r=='-')neg=true;
+//        else ret+=r-'0';
+//    }
+//    if(neg) ret *= -1;
+//}
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
 
     int m, n;
-    m = readint();
-    n = readint();
+    readint(m);
+    readint(n);
 
     int v[m+1];
     for(int i= 0; i <= m; i++) {
@@ -80,8 +96,8 @@ int main() {
         char c;
         c = getchar();
         int q1, q2;
-        q1 = readint();
-        q2 = readint();
+        readint(q1);
+        readint(q2);
 
         if(c == '?') {
             if(setfind(q1, v) == setfind(q2, v)) {
