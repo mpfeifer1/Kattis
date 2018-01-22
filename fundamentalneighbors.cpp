@@ -71,68 +71,33 @@ ll readint(){
 
 
 
-struct point {
-    double x, y;
-};
+ll neighbor(ll n) {
+    umap<ll,ll> m;
 
-double dist(point& p1, point& p2) {
-    return sqrt(pow(p1.x-p2.x,2) + pow(p1.y-p2.y,2));
+    for(int i = 2; i <= sqrt(n); i++) {
+        while(n % i == 0) {
+            n /= i;
+            m[i]++;
+        }
+    }
+
+    if(n > 1) {
+        m[n]++;
+    }
+
+    ll total = 1;
+    for(auto i : m) {
+        total *= pow(i.second, i.first);
+    }
+    return total;
 }
 
 int main() {
     //file();
-    fast();
+    //fast();
 
-    int n;
-    point corners[4];
-    double x, y, w, h, r;
-    int q;
-    bool works;
-
-    cin >> n;
-    cin.ignore();
-
-    while(n--) {
-        cin >> x >> y >> w >> h >> r;
-
-        corners[0] = {x+r,y+r};
-        corners[1] = {x+r,y+h-r};
-        corners[2] = {x+w-r,y+r};
-        corners[3] = {x+w-r,y+h-r};
-
-        cin >> q;
-        while(q--) {
-            point p;
-            cin >> p.x >> p.y;
-
-            works = false;
-
-            if(p.x <= x+w-r && p.x >= x+r && p.y <= y+h && p.y >= y) {
-                works = true;
-            }
-            if(p.x <= x+w && p.x >= x && p.y <= y+h-r && p.y >= y+r) {
-                works = true;
-            }
-
-            for(short i = 0; i < 4; i++) {
-                if(works) {
-                    break;
-                }
-                if(dist(p, corners[i]) <= r) {
-                    works = true;
-                }
-
-            }
-
-            if(works) {
-                cout << "inside" << endl;
-            }
-            else {
-                cout << "outside" << endl;
-            }
-        }
-
-        cout << endl;
+    ll n;
+    while(cin >> n) {
+        cout << n << " " << neighbor(n) << enld;
     }
-
 }
