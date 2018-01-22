@@ -87,6 +87,10 @@ void search(vector<ll>& v, ll pos, ll curr) {
         }
     }
     else {
+        ll target = sum / 2;
+        if((curr - target) > bestdiff) {
+            return;
+        }
         search(v, pos+1, curr);
         search(v, pos+1, curr+v[pos]);
     }
