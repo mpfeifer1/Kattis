@@ -116,6 +116,7 @@ int main() {
 
     vector<edge> edges;
 
+    // Read input
     int unique = 0;
     for(int i = 0; i < n; i++) {
         string s1, s2;
