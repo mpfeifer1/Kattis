@@ -71,9 +71,9 @@ ll readint(){
 
 
 
-void dfs1(vector<vector<int>>& adj, vector<bool>& vis, stack<int>& s, int curr) {
+void dfs1(vector<int>* adj, vector<bool>& vis, stack<int>& s, int curr) {
     vis[curr] = true;
-    for(auto i : adj[curr]) {
+    for(auto& i : adj[curr]) {
         if(!vis[i]) {
             dfs1(adj, vis, s, i);
         }
@@ -81,19 +81,19 @@ void dfs1(vector<vector<int>>& adj, vector<bool>& vis, stack<int>& s, int curr) 
     s.push(curr);
 }
 
-void dfs2(vector<vector<int>>& adj, vector<bool>& vis, vector<int>& comp, int curr) {
+void dfs2(vector<int>* adj, vector<bool>& vis, vector<int>& comp, int curr) {
     vis[curr] = true;
     comp.pb(curr);
 
-    for(auto i : adj[curr]) {
+    for(auto& i : adj[curr]) {
         if(!vis[i]) {
             dfs2(adj, vis, comp, i);
         }
     }
 }
 
-unordered_map<string,int> conv;
-unordered_map<int,string> rev;
+umap<string,int> conv;
+umap<int,string> rev;
 
 bool cmp1(int& a, int& b) {
     return rev[a] < rev[b];
@@ -103,6 +103,10 @@ bool cmp2(vector<int>& v1, vector<int>& v2) {
     return rev[v1[0]] < rev[v2[0]];
 }
 
+struct edge {
+    int n1, n2;
+};
+
 int main() {
     //file();
     fast();
@@ -110,8 +114,8 @@ int main() {
     int n;
     cin >> n;
 
-    vector<vector<int>> adj1;
-    vector<vector<int>> adj2;
+    vector<edge> edges;
+
     int unique = 0;
     for(int i = 0; i < n; i++) {
         string s1, s2;
@@ -122,15 +126,11 @@ int main() {
             conv[s1] = unique;
             rev[unique] = s1;
             unique++;
-            adj1.push_back({});
-            adj2.push_back({});
         }
         if(!conv.count(s2)) {
             conv[s2] = unique;
             rev[unique] = s2;
             unique++;
-            adj1.push_back({});
-            adj2.push_back({});
         }
 
         // Get node numbers
@@ -138,8 +138,15 @@ int main() {
         int n2 = conv[s2];
 
         // Add to adjacency
-        adj1[n1].pb(n2);
-        adj2[n2].pb(n1);
+        edges.pb({n1,n2});
+    }
+
+    // Build Adjacency
+    vector<int> adj1[unique];
+    vector<int> adj2[unique];
+    for(auto& i : edges) {
+        adj1[i.n1].pb(i.n2);
+        adj2[i.n2].pb(i.n1);
     }
 
     // Run first DFS to get 'leave' times
@@ -180,9 +187,9 @@ int main() {
     sort(all(single), cmp1);
 
     // Print connected components
-    for(auto i : other) {
+    for(auto& i : other) {
         cout << "okay ";
-        for(auto j : i) {
+        for(auto& j : i) {
             cout << rev[j] << " ";
         }
         cout << endl;
@@ -191,7 +198,7 @@ int main() {
     // Print lone components
     if(single.size() > 0) {
         cout << "avoid ";
-        for(auto i : single) {
+        for(auto& i : single) {
             cout << rev[i] << " ";
         }
         cout << endl;
