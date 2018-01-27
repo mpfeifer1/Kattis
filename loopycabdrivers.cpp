@@ -92,19 +92,8 @@ void dfs2(vector<int>* adj, vector<bool>& vis, vector<int>& comp, int curr) {
     }
 }
 
-umap<string,int> conv;
-umap<int,string> rev;
-
-bool cmp1(int& a, int& b) {
-    return rev[a] < rev[b];
-}
-
-bool cmp2(vector<int>& v1, vector<int>& v2) {
-    return rev[v1[0]] < rev[v2[0]];
-}
-
 struct edge {
-    int n1, n2;
+    string n1, n2;
 };
 
 int main() {
@@ -115,39 +104,37 @@ int main() {
     cin >> n;
 
     vector<edge> edges;
+    map<string,int> conv;
+    vector<string> rev;
 
     // Read input
-    int unique = 0;
     for(int i = 0; i < n; i++) {
         string s1, s2;
         cin >> s1 >> s2;
 
         // If unseen, add
-        if(!conv.count(s1)) {
-            conv[s1] = unique;
-            rev[unique] = s1;
-            unique++;
-        }
-        if(!conv.count(s2)) {
-            conv[s2] = unique;
-            rev[unique] = s2;
-            unique++;
-        }
+        conv[s1] = 1;
+        conv[s2] = 1;
 
-        // Get node numbers
-        int n1 = conv[s1];
-        int n2 = conv[s2];
+        edges.pb({s1,s2});
+    }
 
-        // Add to adjacency
-        edges.pb({n1,n2});
+    // Build mapping
+    int unique = 0;
+    for(auto& i : conv) {
+        i.second = unique;
+        rev.pb(i.first);
+        unique++;
     }
 
     // Build Adjacency
     vector<int> adj1[unique];
     vector<int> adj2[unique];
     for(auto& i : edges) {
-        adj1[i.n1].pb(i.n2);
-        adj2[i.n2].pb(i.n1);
+        int n1 = conv[i.n1];
+        int n2 = conv[i.n2];
+        adj1[n1].pb(n2);
+        adj2[n2].pb(n1);
     }
 
     // Run first DFS to get 'leave' times
@@ -182,10 +169,10 @@ int main() {
 
     // Sort all
     for(auto& i : other) {
-        sort(all(i), cmp1);
+        sort(all(i));
     }
-    sort(all(other), cmp2);
-    sort(all(single), cmp1);
+    sort(all(other));
+    sort(all(single));
 
     // Print connected components
     for(auto& i : other) {
