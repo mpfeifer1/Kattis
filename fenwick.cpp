@@ -5,40 +5,47 @@ using namespace std;
 
 typedef long long ll;
 
-void update(vector<ll>& v, ll index, ll value) {
-    for(ll i = index; i < v.size(); i |= i+1) {
-        v[i] += value;
+ll n, q;
+ll v[5000005];
+
+void update(ll* v, ll index, ll value) {
+    index++;
+    while(index < n+5) {
+        v[index] += value;
+        index += index & (-index);
     }
 }
 
-ll sum(vector<ll>& v, ll index) {
-    ll total = 0;
-    for(ll i = index; i > 0; i &= i-1) {
-        total += v[i-1];
+ll sum(ll* v, ll index) {
+    ll total = v[0];
+    while(index > 0) {
+        total += v[index];
+        index -= index & (-index);
     }
     return total;
 }
 
 int main() {
-    ll n, q;
-    cin >> n >> q;
+    ios::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
 
-    vector<ll> v;
-    v.resize(n, 0);
+    scanf("%lld%lld\n", &n, &q);
+    for(int i = 0; i < n+5; i++) {
+        v[i] = 0;
+    }
 
+    ll index, value;
     for(ll i = 0; i < q; i++) {
         char op;
-        cin >> op;
+        scanf("%c", &op);
 
         if(op == '+') {
-            ll index, value;
-            cin >> index >> value;
+            scanf("%lld%lld\n", &index, &value);
             update(v, index, value);
         }
         if(op == '?') {
-            ll index;
-            cin >> index;
-            cout << sum(v, index) << endl;
+            scanf("%lld\n", &index);
+            printf("%lld\n", sum(v, index));
         }
     }
 }
