@@ -3,9 +3,8 @@
 using namespace std;
 
 struct question {
-    int wrongs;
-    bool ac;
-    int time;
+    bool ac = false;
+    int time = 0;
 };
 
 int main() {
@@ -16,19 +15,13 @@ int main() {
         string s;
         cin >> q >> s;
 
-        if(m[1].ac) {
-            continue;
+        if(s == "right") {
+            m[q].ac = true;
+            m[q].time += t;
         }
         else {
-            if(s == "right") {
-                m[q].ac = true;
-                m[q].time = t;
-            }
-            else {
-                m[q].wrongs++;
-            }
+            m[q].time += 20;
         }
-
     }
 
     int rights = 0;
@@ -36,7 +29,7 @@ int main() {
     for(auto i : m) {
         if(i.second.ac) {
             rights++;
-            total += i.second.time + i.second.wrongs*20;
+            total += i.second.time;
         }
     }
 
