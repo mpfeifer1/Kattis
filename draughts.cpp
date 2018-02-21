@@ -51,7 +51,7 @@ void file() {
 
 
 
-int calc(vector<vector<char>>& v, int x, int y) {
+int calc(char v[10][10], int x, int y) {
     int score = 0;
 
     if(x+2 < 10 && y+2 < 10) {
@@ -118,20 +118,19 @@ int calc(vector<vector<char>>& v, int x, int y) {
 
 int main() {
     //file();
-    //fast();
+    fast();
 
     int cases;
     cin >> cases;
 
     while(cases--) {
-        vector<vector<char>> v;
-        v.resize(10, vector<char>(10));
+        char v[10][10];
 
-        for(auto& i : v) {
-            for(auto& j : i) {
-                cin >> j;
-                if(j == '#') {
-                    j = '.';
+        for(int i = 0; i < 10; i++) {
+            for(int j = 0; j < 10; j++) {
+                cin >> v[i][j];
+                if(v[i][j] == '#') {
+                    v[i][j] = '.';
                 }
             }
         }
