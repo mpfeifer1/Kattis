@@ -51,13 +51,9 @@ void file() {
 
 
 
-ll ceildiv(ll hi, ll lo) {
-    return (hi+lo-1) / lo;
-}
-
 int main() {
     //file();
-    //fast();
+    fast();
 
     ll n, m;
     cin >> n >> m;
@@ -76,7 +72,7 @@ int main() {
         s2.pb(t);
     }
 
-    map<int,int> diffs;
+    umap<int,int> diffs;
 
     for(auto i : s1) {
         for(auto j : s2) {
@@ -90,6 +86,9 @@ int main() {
         if(i.first > 0 && i.second > bestcnt) {
             bestval = i.first;
             bestcnt = i.second;
+        }
+        if(i.first > 0 && i.second == bestcnt) {
+            bestval = min(bestval, i.first);
         }
     }
 
