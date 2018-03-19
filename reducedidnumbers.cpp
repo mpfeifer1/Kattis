@@ -52,12 +52,12 @@ void file() {
 
 
 bool unique(vector<int>& v, int n) {
-    map<int,int> id;
+    set<int> id;
     for(auto i : v) {
-        id[i%n]++;
-        if(id[i%n] > 1) {
+        if(id.count(i%n) > 0) {
             return false;
         }
+        id.insert(i%n);
     }
     return true;
 }
