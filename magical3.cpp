@@ -80,18 +80,13 @@ ll getbase(ll n) {
     for(int i = 0; i < factors.size(); i++) {
         if(factors[i] > 3) {
             best = min(best, factors[i]);
+            break;
         }
     }
 
     // Grab the best compound factor
-    for(int i = 0; i < factors.size(); i++) {
-        for(int j = 0; j < factors.size(); j++) {
-            if(i == j) {
-                continue;
-            }
-            ll fac = factors[i] * factors[j];
-            best = min(best, fac);
-        }
+    if(factors.size() >= 2) {
+        best = min(best, factors[0] * factors[1]);
     }
 
     return best;
