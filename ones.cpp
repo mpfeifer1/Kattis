@@ -53,12 +53,19 @@ void file() {
 
 int main() {
     //file();
-    //fast();
+    fast();
+
+    map<int,int> m;
 
     int n;
     while(cin >> n) {
         int val = 1;
         int ans = 1;
+
+        if(m.count(n) > 0) {
+            cout << m[n] << endl;
+            continue;
+        }
 
         while(val % n != 0) {
             val *= 10;
@@ -67,6 +74,7 @@ int main() {
             ans++;
         }
 
+        m[n] = ans;
         cout << ans << endl;
     }
 
