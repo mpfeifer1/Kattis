@@ -52,12 +52,15 @@ void file() {
 
 
 struct event {
-    ll start, end, len;
+    int start, end;
 };
 
 bool cmp(event& e1, event& e2) {
     if(e1.start == e2.start) {
-        return e1.len < e2.len;
+        if(e1.end == e2.end) {
+            return false;
+        }
+        return e1.end < e2.end;
     }
     return e1.start < e2.start;
 }
@@ -66,35 +69,31 @@ int main() {
     //file();
     fast();
 
-    ll n, m;
+    int n, m;
     cin >> n >> m;
 
     vector<event> v(n);
     for(auto& i : v) {
-        cin >> i.start >> i.len;
+        cin >> i.start;
+        int t;
+        cin >> t;
+        i.end = i.start + t;
     }
+
     sort(all(v), cmp);
 
-    multiset<ll> endtimes;
-    ll saves = 0;
+    multiset<int> endtimes;
+    int saves = 0;
     for(auto i : v) {
-        while(!endtimes.empty()) {
-            if(*endtimes.begin() > i.start) {
-                break;
-            }
-            if(*endtimes.begin() + m >= i.start) {
-                endtimes.erase(endtimes.begin());
-                saves++;
-                break;
-            }
-            endtimes.erase(endtimes.begin());
+        auto it = endtimes.lower_bound(i.start-m);
+        if(it != endtimes.end() && *it <= i.start) {
+            endtimes.erase(it);
+            saves++;
         }
-        endtimes.insert(i.start + i.len);
+        endtimes.insert(i.end);
     }
 
     cout << saves << endl;
 
     return 0;
 }
-
-
