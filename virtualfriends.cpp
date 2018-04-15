@@ -5,90 +5,66 @@
 
 using namespace std;
 
-struct Node {
-    string name;
-    int rank;
-    Node* parent;
-    Node(string s) : name(s), rank(1), parent(this){}
-};
-
-map<string, Node*> people;
-void makeSet(string a);
-void union2(string a, string b);
-Node* findSet(string a);
-
-void makeSet(string a) {
-    Node* n = new Node(a);
-    people.insert(pair<string, Node*>(a,n));
+int find(vector<int>& d, int a) {
+    if(d[a] < 0) {
+        return a;
+    }
+    return d[a] = find(d, d[a]);
 }
 
-void union2(string a, string b) {
-    Node* temp1 = people.find(a)->second;
-    Node* temp2 = people.find(b)->second;
-
-    temp1 = findSet(a);
-    temp2 = findSet(b);
-
-    if(temp1 == temp2) {
-        return;
-    }
-
-    if(temp1->rank > temp2->rank) {
-        temp2->parent = temp1;
-        temp1->rank += temp2->rank;
-        return;
-    }
-    if(temp1->rank < temp2->rank) {
-        temp1->parent = temp2;
-        temp2->rank += temp1->rank;
-        return;
-    }
-    if(temp1->rank == temp2->rank) {
-        temp2->parent = temp1;
-        temp1->rank += temp2->rank;
-        return;
-    }
-
-    return;
+void join(vector<int>& d, int a, int b) {
+    a = find(d, a);
+    b = find(d, b);
+    if(a == b) return;
+    d[b] += d[a];
+    d[a] = b;
 }
 
-Node* findSet(string a) {
-    Node* temp = people.find(a)->second;
-    Node* leaf = temp;
-    while(temp->parent != temp) {
-        temp = temp->parent;
-    }
-    leaf->parent = temp;
-    return temp;
+int size(vector<int>& d, int a) {
+    a = find(d, a);
+    return -d[a];
 }
 
+void solve() {
+    int n;
+    cin >> n;
 
-int main()
-{
+    vector<int> d;
+    map<string,int> idx;
+
+    for(int i = 0; i < n; i++) {
+        string s1, s2;
+        cin >> s1 >> s2;
+
+        if(idx.count(s1) == 0) {
+            idx[s1] = d.size();
+            d.push_back(-1);
+        }
+
+        if(idx.count(s2) == 0) {
+            idx[s2] = d.size();
+            d.push_back(-1);
+        }
+
+        int v1 = idx[s1];
+        int v2 = idx[s2];
+
+        join(d, v1, v2);
+        cout << size(d, v1) << endl;
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+
     int cases;
     cin >> cases;
 
-    for(int i = 0; i < cases; i++) {
-        int inputs;
-        cin >> inputs;
-        people.clear();
-
-        for(int j = 0; j < inputs; j++) {
-            string name1, name2;
-            cin >> name1 >> name2;
-
-            if(people.count(name1) == 0) {
-                makeSet(name1);
-            }
-            if(people.count(name2) == 0) {
-                makeSet(name2);
-            }
-
-            union2(name1, name2);
-            cout << findSet(name1)->rank << endl;
-
-        }
+    while(cases--) {
+        solve();
     }
+
     return 0;
 }
 
