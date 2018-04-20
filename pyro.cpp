@@ -55,21 +55,23 @@ int main() {
     //file();
     fast();
 
-    set<int> s;
+    vector<bool> seen(524289, false);
+    vector<int> all;
 
     int n;
     while(cin >> n && n != -1) {
-        s.insert(n);
+        seen[n] = true;
+        all.pb(n);
     }
 
-    for(auto& num : s) {
+    for(auto& num : all) {
         int ways = 0;
 
         // Calculate how many are achievable using 1 bit
         for(int i = 0; i < 18; i++) {
             int xorval = 1 << i;
             int val = num ^ xorval;
-            if(val > num && s.count(val)) {
+            if(val > num && seen[val]) {
                 ways++;
             }
         }
@@ -80,7 +82,7 @@ int main() {
                 int xor1 = 1 << i;
                 int xor2 = 1 << j;
                 int val = num ^ xor1 ^ xor2;
-                if(val > num && s.count(val)) {
+                if(val > num && seen[val]) {
                     ways++;
                 }
             }
