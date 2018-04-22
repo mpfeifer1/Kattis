@@ -77,15 +77,17 @@ int main() {
         }
 
         // Using two bits
+        int xor1 = 1;
         for(int i = 0; i < 18; i++) {
+            int xor2 = 1;
             for(int j = 0; j < i; j++) {
-                int xor1 = 1 << i;
-                int xor2 = 1 << j;
                 int val = num ^ xor1 ^ xor2;
                 if(val > num && seen[val]) {
                     ways++;
                 }
+                xor2 <<= 1;
             }
+            xor1 <<= 1;
         }
 
         cout << num << ":" << ways << endl;
