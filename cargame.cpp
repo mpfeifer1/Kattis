@@ -51,23 +51,20 @@ void file() {
 
 
 
-bool match(string& s, string& pat) {
-    bool f1 = false;
-    bool f2 = false;
+struct graph {
+    vector<vector<int>> adj;
+    string s;
+};
 
-    for(auto& i : s) {
-        if(i == pat[2] && f2) {
-            return true;
+bool find(vector<vector<int>>& g, string& s) {
+    int pos = 0;
+    for(auto i : s) {
+        if(g[pos][i-'a'] == iinf) {
+            return false;
         }
-        if(i == pat[1] && f1) {
-            f2 = true;
-        }
-        if(i == pat[0]) {
-            f1 = true;
-        }
+        pos = g[pos][i-'a'];
     }
-
-    return false;
+    return true;
 }
 
 int main() {
@@ -77,66 +74,45 @@ int main() {
     int n, m;
     cin >> n >> m;
 
-    vector<string> v(n);
-    map<char, bool> ininput;
-    for(char i = 'a'; i <= 'z'; i++) {
-        ininput[i] = false;
-    }
-    for(auto& s : v) {
-        cin >> s;
-        for(auto& i : s) {
-            ininput[i] = true;
-        }
-    }
+    vector<graph> v;
 
-    map<string, int> memo;
+    for(int i = 0; i < n; i++) {
+        graph g;
+        cin >> g.s;
+
+        // Build the graph for each string
+        g.adj.resize(g.s.size()+1, vector<int>(26, iinf));
+
+        // Create a node to each start
+        for(int j = 0; j < g.s.size(); j++) {
+            g.adj[0][g.s[j]-'a'] = min(g.adj[0][g.s[j]-'a'], j+1);
+        }
+
+        for(int j = 0; j < g.s.size(); j++) {
+            for(int k = j+1; k < g.s.size(); k++) {
+                // edge from i+1 to j+1
+                g.adj[j+1][g.s[k]-'a'] = min(g.adj[j+1][g.s[k]-'a'], k+1);
+            }
+        }
+
+        v.pb(g);
+    }
 
     for(int i = 0; i < m; i++) {
-        // Take in input, make it lowercase
         string s;
         cin >> s;
-        for(auto& j : s) {
-            j = tolower(j);
-        }
+        for(auto& j : s) j = tolower(j);
 
-        // If a char isn't in the input, skip it
-        if(!ininput[s[0]] || !ininput[s[1]] || !ininput[s[2]]) {
-            cout << "No valid word" << endl;
-            continue;
-        }
-
-        // If in memo as bad, print
-        if(memo.count(s) > 0 && memo[s] == -1) {
-            cout << "No valid word" << endl;
-            continue;
-        }
-
-        // If in memo, skip it
-        if(memo.count(s) > 0) {
-            cout << v[memo[s]] << endl;
-            continue;
-        }
-
-        // If not in memo, find it
-        bool found = false;
-        int idx = 0;
-        for(auto& j : v) {
-            if(match(j, s)) {
-                found = true;
+        bool printed = false;
+        for(auto& g : v) {
+            if(find(g.adj, s)) {
+                printed = true;
+                cout << g.s << endl;
                 break;
             }
-            idx++;
         }
 
-        // If found, add to memo, print
-        if(found) {
-            memo[s] = idx;
-            cout << v[idx] << endl;
-        }
-
-        // Else say not found, add to bad memo
-        else {
-            memo[s] = -1;
+        if(!printed) {
             cout << "No valid word" << endl;
         }
     }
