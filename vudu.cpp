@@ -31,6 +31,7 @@ int main() {
         i -= p;
     }
 
+    // Pair contains {sum, index}
     indexed_set<pair<ll,ll>> s;
     s.insert({0,-1});
 
