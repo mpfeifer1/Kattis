@@ -1,87 +1,74 @@
-#include <unordered_map>
-#include <algorithm>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cmath>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-int getDist(char a, char b, vector<string>& keyboard) {
-    int ax, ay, bx, by;
+// Calculate distance between two points
+int d(pair<int,int>& p1, pair<int,int>& p2) {
+    return abs(p1.first - p2.first) + abs(p1.second - p2.second);
+}
 
-    for(int i = 0; i < 3; i++) {
-        for(int j = 0; j < keyboard[0].size(); j++) {
-            if(keyboard[i][j] == a) {
-                ax = j;
-                ay = i;
-            }
-            if(keyboard[i][j] == b) {
-                bx = j;
-                by = i;
-            }
-        }
+// Sort strings by their value, then alphabetically
+bool cmp(pair<string,int>& p1, pair<string,int>& p2) {
+    if(p1 == p2) return false;
+    if(p1.second == p2.second) {
+        return p1.first < p2.first;
     }
-
-    return abs(ax-bx) + abs(ay-by);
+    return p1.second < p2.second;
 }
 
 int main() {
-    int n;
-    cin >> n;
+    // Build the keyboard
+    vector<string> v;
+    v.push_back("qwertyuiop");
+    v.push_back("asdfghjkl");
+    v.push_back("zxcvbnm");
 
-    unordered_map<string, int> distances;
-
-    vector<string> keyboard = {"qwertyuiop",
-                               "asdfghjkl",
-                               "zxcvbnm"};
-
-    for(char i = 'a'; i <= 'z'; i++) {
-        for(char j = 'a'; j <= 'z'; j++) {
-            int dist = getDist(i, j, keyboard);
-            string temp;
-            temp.push_back(i);
-            temp.push_back(j);
-
-            distances[temp] = dist;
+    // Map character to its position
+    map<char,pair<int,int>> pos;
+    for(int i = 0; i < v.size(); i++) {
+        for(int j = 0; j < v[i].size(); j++) {
+            pos[v[i][j]] = {i,j};
         }
     }
 
-    for(int k = 0; k < n; k++) {
-        string word;
-        cin >> word;
+    // For each case
+    int cases;
+    cin >> cases;
+    while(cases--) {
+        // Read in input
+        string s;
+        cin >> s;
+        int n;
+        cin >> n;
 
-        int num;
-        cin >> num;
+        // Map strings to their differences
+        vector<pair<string,int>> m;
 
-        vector<string> words;
-        for(int i = 0; i < num; i++) {
-            string temp;
-            cin >> temp;
+        // For each query string
+        for(int i = 0; i < n; i++) {
+            // Read it in
+            string t;
+            cin >> t;
 
-            words.push_back(temp);
-        }
-
-        vector<pair<int, string>> sortable;
-
-        for(int i = 0; i < num; i++) {
-            int dist = 0;
-
-            for(int j = 0; j < word.length(); j++) {
-                string search;
-                search.push_back(word[j]);
-                search.push_back(words[i][j]);
-
-                dist += distances[search];
+            // For each character, calculate the difference
+            int diff = 0;
+            for(int j = 0; j < t.size(); j++) {
+                pair<int,int> p1 = pos[s[j]];
+                pair<int,int> p2 = pos[t[j]];
+                diff += d(p1,p2);
             }
 
-            sortable.push_back({dist, words[i]});
+            // Save this string+difference
+            m.push_back({t,diff});
         }
 
-        sort(sortable.begin(), sortable.end());
+        // Sort the strings by difference
+        sort(m.begin(), m.end(), cmp);
 
-        for(auto s : sortable) {
-            cout << s.second << " " << s.first << endl;
+        // Print all the strings
+        for(auto i : m) {
+            cout << i.first << " " << i.second << endl;
         }
     }
+
 }
