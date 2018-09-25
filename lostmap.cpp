@@ -6,53 +6,45 @@
 
 using namespace std;
 
-typedef long long ll;
-
-ll inf = (ll)2 << 58;
-
 struct edge {
-    ll n1;
-    ll n2;
-    ll dist;
+    int n1;
+    int n2;
+    int dist;
 };
 
-bool cmp(edge lhs, edge rhs) {
+bool cmp(edge& lhs, edge& rhs) {
     return lhs.dist < rhs.dist;
 }
 
-ll find(vector<ll>& disjoint, ll a) {
-    if(disjoint[a] == -1) {
-        return a;
-    }
-
-    disjoint[a] = find(disjoint, disjoint[a]);
-    return disjoint[a];
+int find(vector<int>& d, int a) {
+    if(d[a] < 0) return a;
+    return d[a] = find(d, d[a]);
 }
 
-void join(vector<ll>& disjoint, ll a, ll b) {
-    a = find(disjoint, a);
-    b = find(disjoint, b);
-
-    if(a == b) {
-        return;
+void join(vector<int>& d, int a, int b) {
+    a = find(d, a);
+    b = find(d, b);
+    if(a == b) return;
+    if(d[a] > d[b]) {
+        swap(a,b);
     }
-
-    disjoint[a] = b;
+    d[a] += d[b];
+    d[b] = a;
 }
 
 int main() {
     ios::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(NULL); cout.tie(NULL);
 
-    ll v;
+    int v;
     cin >> v;
 
     vector<edge> e;
-    for(ll i = 0; i < v; i++) {
-        for(ll j = 0; j < v; j++) {
-            ll num;
+    for(int i = 0; i < v; i++) {
+        for(int j = 0; j < v; j++) {
+            int num;
             cin >> num;
-            if(i != j) {
+            if(i > j) {
                 e.push_back({i, j, num});
             }
         }
@@ -60,14 +52,14 @@ int main() {
 
     sort(e.begin(), e.end(), cmp);
 
-    vector<ll> disjoint(v, -1);
+    vector<int> d(v, -1);
 
     for(auto i : e) {
-        ll n1 = find(disjoint, i.n1);
-        ll n2 = find(disjoint, i.n2);
+        int n1 = find(d, i.n1);
+        int n2 = find(d, i.n2);
         if(n1 != n2) {
-            cout << i.n1 + 1 << " " << i.n2+1 << endl;
-            join(disjoint, n1, n2);
+            cout << i.n1 + 1 << " " << i.n2 + 1 << endl;
+            join(d, n1, n2);
         }
     }
 }
