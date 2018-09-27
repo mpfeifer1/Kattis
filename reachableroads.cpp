@@ -1,58 +1,41 @@
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-int find(vector<int>& conn, int i) {
-    if(conn[i] < 0) {
-        return i;
-    }
-
-    conn[i] = find(conn, conn[i]);
-    return conn[i];
+int find(vector<int>& d, int a) {
+    if(d[a] == -1) return a;
+    return d[a] = find(d, d[a]);
 }
 
-void join(vector<int>& conn, int a, int b) {
-    a = find(conn, a);
-    b = find(conn, b);
+void join(vector<int>& d, int a, int b) {
+    a = find(d, a);
+    b = find(d, b);
+    if(a == b) return;
+    d[a] = b;
+}
 
-    if(a == b) {
-        return;
+void solve() {
+    int n, m;
+    cin >> n >> m;
+    vector<int> d(n,-1);
+    for(int i = 0; i < m; i++) {
+        int n1, n2;
+        cin >> n1 >> n2;
+        join(d,n1,n2);
     }
 
-    conn[b] = a;
+    int cc = 0;
+    for(int i = 0; i < n; i++) {
+        if(d[i] == -1) cc++;
+    }
+
+    cout << cc-1 << endl;
 }
 
 int main() {
     int cases;
     cin >> cases;
-
-    vector<int> conn;
-
     while(cases--) {
-        // Read in input
-        int cities, roads;
-        cin >> cities >> roads;
-
-        // Clear old roads
-        conn.clear();
-        conn.resize(cities, -1);
-
-        // Connect each set of roads
-        for(int i = 0; i < roads; i++) {
-            int r1, r2;
-            cin >> r1 >> r2;
-            join(conn, r1, r2);
-        }
-
-        // Count the roads needed
-        int extras = 0;
-        for(int i = 1; i < cities; i++) {
-            if(find(conn, 0) != find(conn, i)) {
-                join(conn, 0, i);
-                extras++;
-            }
-        }
-        cout << extras << endl;
+        solve();
     }
 }

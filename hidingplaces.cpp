@@ -1,114 +1,74 @@
-#include <algorithm>
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <string>
+#include <bits/stdc++.h>
 
 using namespace std;
+int inf = 1 << 15;
 
-struct spot {
-    int f;
-    int r;
-    int dist;
-};
-
-// Checks if a spot is in the board
-bool inrange(vector<vector<int>>& v, int i, int j) {
-    if(i < 0 || j < 0 || i > 7 || j > 7) {
-        return false;
-    }
-    if(v[i][j] == -1) {
-        return true;
-    }
-    return false;
+bool inrange(int i, int j) {
+    return i >= 0 && j >= 0 && i < 8 && j < 8;
 }
 
-bool compare(string lhs, string rhs) {
-    if(lhs[1] == rhs[1]) {
-        return lhs[0] < rhs[0];
+void bfs(vector<vector<int>>& dist, int starti, int startj) {
+    queue<pair<int,int>> q;
+    q.push({starti,startj});
+    dist[starti][startj] = 0;
+
+    vector<int> dx = {1,2,2,1,-1,-2,-2,-1};
+    vector<int> dy = {-2,-1,1,2,2,1,-1,-2};
+
+    while(!q.empty()) {
+        int curri = q.front().first;
+        int currj = q.front().second;
+        q.pop();
+
+        for(int k = 0; k < 8; k++) {
+            int nexti = curri + dx[k];
+            int nextj = currj + dy[k];
+
+            if(!inrange(nexti,nextj)) continue;
+            if(dist[nexti][nextj] > dist[curri][currj] + 1) {
+                dist[nexti][nextj] = dist[curri][currj] + 1;
+                q.push({nexti,nextj});
+            }
+        }
     }
-    return lhs[1] > rhs[1];
+}
+
+void solve() {
+    string s;
+    cin >> s;
+
+    // Run BFS
+    vector<vector<int>> dist(8, vector<int>(8,inf));
+    bfs(dist, s[0]-'a', s[1]-'1');
+
+    // Find farthest dist, print it
+    int far = 0;
+    for(int i = 0; i < 8; i++) {
+        for(int j = 0; j < 8; j++) {
+            far = max(far, dist[i][j]);
+        }
+    }
+    cout << far << " ";
+
+    // Find all at that dist
+    vector<string> ans;
+    for(int j = 7; j >= 0; j--) {
+        for(int i = 0; i < 8; i++) {
+            if(dist[i][j] == far) {
+                string here;
+                here += i+'a';
+                here += j+'1';
+                cout << here << " ";
+            }
+        }
+    }
+    cout << endl;
 }
 
 int main() {
-    int n;
-    cin >> n;
-
-    for(int i = 0; i < n; i++) {
-        // Read in data
-        char file, rank;
-        cin >> file >> rank;
-        vector<vector<int>> v;
-        v.resize(8, vector<int>(8, -1));
-
-        // Mark first spot
-        queue<spot> q;
-        q.push({file-'a', rank-'1', 0});
-
-        while(!q.empty()) {
-            // Mark current spot
-            int f = q.front().f;
-            int r = q.front().r;
-            int d = q.front().dist;
-            q.pop();
-            v[f][r] = d;
-
-            // Add new potential spots
-            if(inrange(v, f-2, r-1)) {
-                q.push({f-2, r-1, v[f][r]+1});
-            }
-            if(inrange(v, f-2, r+1)) {
-                q.push({f-2, r+1, v[f][r]+1});
-            }
-            if(inrange(v, f+2, r-1)) {
-                q.push({f+2, r-1, v[f][r]+1});
-            }
-            if(inrange(v, f+2, r+1)) {
-                q.push({f+2, r+1, v[f][r]+1});
-            }
-            if(inrange(v, f-1, r-2)) {
-                q.push({f-1, r-2, v[f][r]+1});
-            }
-            if(inrange(v, f-1, r+2)) {
-                q.push({f-1, r+2, v[f][r]+1});
-            }
-            if(inrange(v, f+1, r-2)) {
-                q.push({f+1, r-2, v[f][r]+1});
-            }
-            if(inrange(v, f+1, r+2)) {
-                q.push({f+1, r+2, v[f][r]+1});
-            }
-        }
-
-        // Find max
-        int max = 0;
-        for(auto i : v) {
-            for(auto j : i) {
-                if(j > max) {
-                    max = j;
-                }
-            }
-        }
-        cout << max << " ";
-
-        // Find all spots that correlate to the max
-        vector<string> ans;
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                if(v[i][j] == max) {
-                    string s;
-                    s += (char)(i+'a');
-                    s += (char)(j+'1');
-                    ans.push_back(s);
-                }
-            }
-        }
-
-        // Sort answer by rank and file
-        sort(ans.begin(), ans.end(), compare);
-        for(auto i : ans) {
-            cout << i << " ";
-        }
-        cout << endl;
+    int cases;
+    cin >> cases;
+    while(cases--) {
+        solve();
     }
 }
