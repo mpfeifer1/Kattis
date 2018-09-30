@@ -4,27 +4,17 @@
 using namespace std;
 
 int main() {
-    string n;
-    cin >> n;
+    string s;
+    cin >> s;
 
-    int s = n.length();
-    int x = 0;
-    int y = 0;
-
-    for(int i = 0; i < s; i++) {
-        if(n[i] == '0') {
-        }
-        if(n[i] == '1') {
-            x += pow(2, s-i-1);
-        }
-        if(n[i] == '2') {
-            y += pow(2, s-i-1);
-        }
-        if(n[i] == '3') {
-            x += pow(2, s-i-1);
-            y += pow(2, s-i-1);
-        }
+    int n = s.length();
+    int i = 0, j = 0;
+    for(auto c : s) {
+        i *= 2;
+        j *= 2;
+        if(int(c-'0')&1) i++;
+        if(int(c-'0')&2) j++;
     }
 
-    cout << s << " " << x << " " << y << endl;
+    cout << n << " " << i << " " << j << endl;
 }
