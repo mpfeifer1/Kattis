@@ -14,7 +14,7 @@ bool bounds(int i, int j) {
     return true;
 }
 
-int getScore(vector<vector<int> > board, bool maxPlayer = true) {
+int getScore(vector<vector<int>>& board, bool maxPlayer = true) {
     if(memo.count({board,maxPlayer}) > 0) {
         return memo[{board,maxPlayer}];
     }
