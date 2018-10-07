@@ -4,6 +4,7 @@ using namespace std;
 vector<int> di = {1, -1, 0,  0, 1,  -1};
 vector<int> dj = {0,  0, 1, -1,  1, -1};
 
+map< pair<vector<vector<int>>,bool>, int> memo;
 
 bool bounds(int i, int j) {
     if(i < 0) return false;
@@ -14,6 +15,10 @@ bool bounds(int i, int j) {
 }
 
 int getScore(vector<vector<int> > board, bool maxPlayer = true) {
+    if(memo.count({board,maxPlayer}) > 0) {
+        return memo[{board,maxPlayer}];
+    }
+
     int bestScore = 1e9;
     if(maxPlayer) bestScore = -1e9;
     int temp;
@@ -43,9 +48,12 @@ int getScore(vector<vector<int> > board, bool maxPlayer = true) {
             }
         }
     }
+
     if(!jumpFound) {
         return 0;
     }
+
+    memo[{board,maxPlayer}] = bestScore;
     return bestScore;
 }
 
