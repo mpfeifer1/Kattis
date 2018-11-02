@@ -34,8 +34,6 @@ void dfs1(vector<vector<int>>& adj, unordered_set<int>& vis, stack<int>& r, int 
     r.push(curr);
 }
 
-
-
 void dfs2(vector<vector<int>>& adj, unordered_set<int>& vis, stack<int>& r, vector<int>& dis, int curr) {
     for(auto i : adj[curr]) {
         if(vis.count(i) == 0) {
