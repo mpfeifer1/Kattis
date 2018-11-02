@@ -2,21 +2,6 @@
 
 using namespace std;
 typedef long long ll;
-typedef pair<char,int> node;
-typedef pair<node,char> state;
-
-ll nodetoll(node& n) {
-    return (ll(n.second)<<32) | n.first;
-}
-
-ll statetoll(state& s) {
-    ll res = s.first.second;
-    res <<= 16;
-    res |= s.first.first;
-    res <<= 16;
-    res |= s.second;
-    return res;
-}
 
 int main() {
     ios::sync_with_stdio(false);
@@ -25,61 +10,41 @@ int main() {
     int n;
     cin >> n;
 
-    unordered_map<ll,vector<node>> adj;
-    unordered_set<int> unreal;
+    vector<int> v(n);
+    unordered_map<int,vector<int>> plus;
+    unordered_map<int,vector<int>> minus;
 
-    adj.reserve(6000000);
-    unreal.reserve(6000000);
+    plus.reserve(n);
+    minus.reserve(n);
 
     for(int i = 0; i < n; i++) {
-        int t;
-        cin >> t;
+        cin >> v[i];
+        int r = i + v[i];
+        int l = i - v[i];
 
-        node n1 = {'t',i};
-        node n2 = {'l',i-t};
-        node n3 = {'r',i+t};
-
-        adj[nodetoll(n1)].push_back(n2);
-        adj[nodetoll(n1)].push_back(n3);
-        adj[nodetoll(n2)].push_back(n1);
-        adj[nodetoll(n3)].push_back(n1);
-
-        unreal.insert(i-t);
-        unreal.insert(i+t);
+        plus[r].push_back(i);
+        minus[l].push_back(i);
     }
 
-    for(auto& i : unreal) {
-        node n1 = {'l',i};
-        node n2 = {'r',i};
+    queue<int> q;
+    vector<bool> vis(n, false);
+    q.push(0);
 
-        adj[nodetoll(n1)].push_back(n2);
-        adj[nodetoll(n2)].push_back(n1);
-    }
-
-    queue<state> q;
-    q.push({{'t',0},'q'});
-    unordered_set<ll> seen;
-    seen.reserve(6000000);
     int best = 0;
 
     while(!q.empty()) {
-        state here = q.front();
+        int curr = q.front();
         q.pop();
 
-        node curr = here.first;
-        char prev = here.second;
+        if(vis[curr]) continue;
+        vis[curr] = true;
+        best = max(best, curr);
 
-        if(seen.count(statetoll(here))) continue;
-        seen.insert(statetoll(here));
-
-        if(curr.first == 't') {
-            best = max(best, curr.second);
+        for(auto i : minus[curr+v[curr]]) {
+            q.push(i);
         }
-
-        for(auto& next : adj[nodetoll(curr)]) {
-            if(curr.first == 't' || next.first != prev) {
-                q.push({next,curr.first});
-            }
+        for(auto i : plus[curr-v[curr]]) {
+            q.push(i);
         }
     }
 
