@@ -30,7 +30,7 @@ string fr(string s) {
 }
 
 string re(string s) {
-    set<string> v;
+    unordered_set<string> v;
 
     queue<string> q;
     q.push(s);
@@ -46,14 +46,18 @@ string re(string s) {
         q.push(fr(curr));
     }
 
-    return *(v.begin());
+    string best = "999999";
+    for(auto& i : v) {
+        best = min(best, i);
+    }
+    return best;
 }
 
 int main() {
     int n;
     cin >> n;
 
-    map<string,int> m;
+    unordered_map<string,int> m;
     for(int i = 0; i < n; i++) {
         string s = "      ";
         for(auto& j : s) {
