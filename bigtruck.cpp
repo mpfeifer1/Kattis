@@ -1,64 +1,85 @@
-#include <iostream>
-#include <vector>
-#include <queue>
+#include <bits/stdc++.h>
 
 using namespace std;
+int inf = 1 << 30;
 
-int inf = 2 << 28;
+struct node {
+    int dest;
+
+    int dist;
+    int items;
+};
+
+bool operator<(const node& n1, const node& n2) {
+    if(n1.dist == n2.dist) {
+        return n1.items < n2.items;
+    }
+    return n1.dist > n2.dist;
+}
 
 int main() {
     int n;
     cin >> n;
 
-    vector<int> items(n+1);
-    for(int i = 1; i <= n; i++) {
-        cin >> items[i];
+    vector<int> items(n);
+    for(auto& i : items) {
+        cin >> i;
     }
 
-    vector<vector<int>> dist;
-    dist.resize(n+1, vector<int>(n+1, inf));
+    int m;
+    cin >> m;
 
-    int c;
-    cin >> c;
-    for(int i = 0; i < c; i++) {
-        int l1, l2, d;
-        cin >> l1 >> l2 >> d;
-        dist[l1][l2] = d;
-        dist[l2][l1] = d;
+    // {dest,weight}
+    vector<vector<pair<int,int>>> adj(n);
+
+    for(int i = 0; i < m; i++) {
+        int n1, n2, w;
+        cin >> n1 >> n2 >> w;
+        n1--; n2--;
+
+        adj[n1].push_back({n2,w});
+        adj[n2].push_back({n1,w});
     }
 
-    // Pairs are distance, items
-    vector<pair<int, int>> visited;
-    visited.resize(n+1, {inf, inf});
+    vector<int> bestDist(n,inf);
+    vector<int> bestItem(n,0);
+    vector<bool> vis(n,false);
 
-    queue<int> q;
-    visited[1] = {0, items[1]};
-    q.push(1);
+    priority_queue<node> q;
+
+    q.push({0,0,items[0]});
+    bestDist[0] = 0;
+    bestItem[0] = items[0];
 
     while(!q.empty()) {
-        int curr = q.front();
+        int curr = q.top().dest;
         q.pop();
 
-        for(int i = 1; i <= n; i++) {
-            // If we can get there faster
-            if(visited[curr].first + dist[curr][i] < visited[i].first) {
-                visited[i].first = visited[curr].first + dist[curr][i];
-                visited[i].second = visited[curr].second + items[i];
-                q.push(i);
+        if(vis[curr]) {
+            continue;
+        }
+        vis[curr] = true;
+
+        for(auto i : adj[curr]) {
+            int next = i.first;
+
+            if(bestDist[next] > bestDist[curr] + i.second) {
+                bestDist[next] = bestDist[curr] + i.second;
+                bestItem[next] = bestItem[curr] + items[next];
+                q.push({next,bestDist[next],bestItem[next]});
             }
-            // If we can get there same time, less items
-            else if(visited[curr].first + dist[curr][i] == visited[i].first && visited[curr].second + items[i] > visited[i].second) {
-                visited[i].first = visited[curr].first + dist[curr][i];
-                visited[i].second = visited[curr].second + items[i];
-                q.push(i);
+
+            else if(bestDist[next] == bestDist[curr] + i.second) {
+                bestItem[next] = max(bestItem[next], bestItem[curr] + items[next]);
+                q.push({next,bestDist[next],bestItem[next]});
             }
         }
     }
 
-    if(visited[n].first < inf) {
-        cout << visited[n].first << " " << visited[n].second << endl;
+    if(bestDist[n-1] >= inf) {
+        cout << "impossible" << endl;
     }
     else {
-        cout << "impossible" << endl;
+        cout << bestDist[n-1] << " " << bestItem[n-1] << endl;
     }
 }
