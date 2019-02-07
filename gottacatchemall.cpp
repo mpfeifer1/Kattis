@@ -17,6 +17,7 @@ int main() {
         cin >> u >> v;
         u--; v--;
 
+        if(u > v) swap(u,v);
         if(seen.count({u,v})) continue;
         seen.insert({u,v});
         edges.push_back({u,v});
@@ -30,25 +31,22 @@ int main() {
 
     ll ans = 0;
     for(int i = 0; i < n; i++) {
-        ans += adj[i].size() * (adj[i].size()-1);
+        ans += (ll)adj[i].size() * (adj[i].size()-1);
     }
 
-    cout << ans << " ";
-
     for(auto i : edges) {
-        if(adj[i.first].size() > adj[i.second].size()) {
-            swap(i.first,i.second);
+        int u = i.first;
+        int v = i.second;
+        if(adj[u].size() > adj[v].size()) {
+            swap(u,v);
         }
         int pos = 0;
-        for(auto j : adj[i.first]) {
-            auto it = lower_bound(adj[i.second].begin()+pos,adj[i.second].end(),j);
-            if(*it == j) {
+        for(auto& j : adj[u]) {
+            auto it = lower_bound(adj[v].begin()+pos,adj[v].end(),j);
+            if(it != adj[v].end() && *it == j) {
                 ans -= 2;
             }
-            else {
-                cout << "fuck " << *it << endl;
-            }
-            pos = it - adj[i.second].begin();
+            pos = it - adj[v].begin();
         }
     }
 
