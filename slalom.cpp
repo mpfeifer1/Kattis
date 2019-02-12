@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-typedef long long ll;
 typedef long double ld;
 
 ld inf = (ld)10000000;
@@ -12,7 +11,7 @@ ld getdist(pair<ld,ld>& p1, pair<ld,ld>& p2) {
     return sqrt(d1 + d2);
 }
 
-void solve(ll n) {
+void solve(int n) {
     vector<pair<ld,ld>> points;
 
     // Read in start points
@@ -21,7 +20,7 @@ void solve(ll n) {
     points.push_back({sx,sy});
 
     // Read in central gates
-    for(ll i = 0; i < n-1; i++) {
+    for(int i = 0; i < n-1; i++) {
         ld y, x1, x2;
         cin >> y >> x1 >> x2;
         points.push_back({x1,y});
@@ -37,7 +36,7 @@ void solve(ll n) {
     x_vals.push_back(sx);
     x_vals.push_back(ex1);
     x_vals.push_back(ex2);
-    for(auto i : points) {
+    for(auto& i : points) {
         x_vals.push_back(i.first);
     }
     // Sort them, keep unique points
@@ -45,20 +44,20 @@ void solve(ll n) {
     x_vals.erase(unique(x_vals.begin(),x_vals.end()),x_vals.end());
 
     // Build endpoint for each X val
-    for(auto i : x_vals) {
+    for(auto& i : x_vals) {
         if(ex1 <= i && i <= ex2) {
             points.push_back({i,ey});
         }
     }
 
     // {dest,weight}
-    vector<vector<pair<ll,ld>>> adj(points.size());
+    vector<vector<pair<int,ld>>> adj(points.size());
 
     // Count all the real points
-    ll real = (n-1) * 2;
+    int real = (n-1) * 2;
 
     // For each point that's not on the bottom
-    for(ll i = 0; i <= real; i++) {
+    for(int i = 0; i <= real; i++) {
         ld lo = -inf;
         ld hi = inf;
 
@@ -66,7 +65,7 @@ void solve(ll n) {
         ld y1 = points[i].second;
 
         // For each real point
-        for(ll j = (i%2==1)?i+2:i+1; j <= real; j++) {
+        for(int j = (i%2==1)?i+2:i+1; j <= real; j++) {
             ld x2 = points[j].first;
             ld y2 = points[j].second;
 
@@ -115,28 +114,38 @@ void solve(ll n) {
     cout << endl;
     */
 
-    // Prepare dijkstra's
+    // Prepare toposort's
     vector<ld> dist(points.size(), inf);
-    set<pair<ld,ll>> s;
+    vector<int> deg(points.size(), 0);
+    for(int i = 0; i < points.size(); i++) {
+        for(auto& j : adj[i]) {
+            deg[j.first]++;
+        }
+    }
+
+    // Prepare queue
+    queue<int> q;
+    q.push(0);
     dist[0] = 0;
-    s.insert({0,0});
 
-    // Run dijkstra's
-    while(!s.empty()) {
-        ll curr = s.begin()->second;
-        s.erase(s.begin());
+    // Run toposort
+    while(!q.empty()) {
+        int curr = q.front();
+        q.pop();
 
-        for(auto i : adj[curr]) {
-            ll next = i.first;
+        for(auto& i : adj[curr]) {
+            int next = i.first;
             ld weight = i.second;
 
-            if(dist[next] > dist[curr] + weight) {
-                s.erase({dist[next],next});
-                dist[next] = dist[curr] + weight;
-                s.insert({dist[next],next});
+            dist[next] = min(dist[next], dist[curr] + weight);
+
+            deg[next]--;
+            if(deg[next] == 0) {
+                q.push(next);
             }
         }
     }
+
 
     /*
     for(int i = 0; i < points.size(); i++) {
@@ -147,7 +156,7 @@ void solve(ll n) {
 
     // Find answer
     ld best = inf;
-    for(ll i = real+1; i < points.size(); i++) {
+    for(int i = real+1; i < points.size(); i++) {
         best = min(best,dist[i]);
     }
 
@@ -157,7 +166,10 @@ void solve(ll n) {
 }
 
 int main() {
-    ll n;
+    ios::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+
+    int n;
     while(cin >> n && n != 0) {
         solve(n);
     }
