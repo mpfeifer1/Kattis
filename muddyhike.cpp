@@ -1,104 +1,52 @@
-#include <unordered_map>
-#include <algorithm>
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
+typedef long long ll;
+ll inf = 1000001;
 
-int find(vector<int>& disjoint, int a) {
-    if(disjoint[a] == -1) {
-        return a;
-    }
-
-    disjoint[a] = find(disjoint, disjoint[a]);
-    return disjoint[a];
-}
-
-void join(vector<int>& disjoint, int a, int b) {
-    a = find(disjoint, a);
-    b = find(disjoint, b);
-
-    if(a == b) {
-        return;
-    }
-
-    disjoint[a] = b;
-}
-
-int linear(int row, int col, int r, int c) {
-    return row * c + col;
-}
-
-bool inrange(int x, int y, int r, int c) {
-    return x >= 0 && y >= 0 && x < r && y < c;
-}
+vector<int> dx = {1,-1,0,0};
+vector<int> dy = {0,0,1,-1};
 
 int main() {
-    int r, c;
-    cin >> r >> c;
-
-    // Map each number to a list of its locations
-    unordered_map<int, vector<pair<int, int>>> locs;
+    int n, m;
+    cin >> n >> m;
     vector<vector<int>> v;
-    vector<int> all;
-    v.resize(r, vector<int>(c));
+    v.resize(n,vector<int>(m+2,-1));
 
-    // Take in input
-    for(int i = 0; i < r; i++) {
-        for(int j = 0; j < c; j++) {
-            int num;
-            cin >> num;
-
-            all.push_back(num);
-            v[i][j] = num;
-
-            locs[num].push_back({i, j});
+    for(int i = 0; i < n; i++) {
+        for(int j = 1; j <= m; j++) {
+            cin >> v[i][j];
         }
     }
 
-    // Set up disjoint set
-    vector<int> disjoint(r*c+2, -1);
+    vector<vector<int>> best;
+    best.resize(n,vector<int>(m+2,inf));
 
-    int left = disjoint.size()-1;
-    int right = disjoint.size()-2;
+    vector<vector<bool>> vis;
+    vis.resize(n,vector<bool>(m+2,false));
 
-    for(int i = 0; i < r; i++) {
-        // Attach top row to top point
-        join(disjoint, left, linear(i, 0, r, c));
+    best[0][0] = 0;
+    set<tuple<int,int,int>> q;
+    q.insert({0,0,0});
 
-        // Attach bot row to bot point
-        join(disjoint, right, linear(i, c-1, r, c));
-    }
+    while(!q.empty()) {
+        int currx = get<1>(*q.begin());
+        int curry = get<2>(*q.begin());
+        q.erase(q.begin());
 
-    // Sort all the points (so the lowest is at the back)
-    sort(all.rbegin(), all.rend());
-    auto it = unique(all.begin(), all.end());
-    all.resize(distance(all.begin(), it));
+        for(int i = 0; i < 4; i++) {
+            int nextx = currx + dx[i];
+            int nexty = curry + dy[i];
 
-    // Keep adding points until it becomes connected
-    int depth = 0;
-    while(all.size() > 0 && find(disjoint, left) != find(disjoint, right)) {
-        depth = all.back();
-        all.pop_back();
-
-        for(auto loc : locs[depth]) {
-            int x = loc.first;
-            int y = loc.second;
-
-            if(inrange(x-1, y, r, c) && v[x-1][y] <= v[x][y]) {
-                join(disjoint, linear(x-1, y, r, c), linear(x, y, r, c));
-            }
-            if(inrange(x+1, y, r, c) && v[x+1][y] <= v[x][y]) {
-                join(disjoint, linear(x+1, y, r, c), linear(x, y, r, c));
-            }
-            if(inrange(x, y-1, r, c) && v[x][y-1] <= v[x][y]) {
-                join(disjoint, linear(x, y-1, r, c), linear(x, y, r, c));
-            }
-            if(inrange(x, y+1, r, c) && v[x][y+1] <= v[x][y]) {
-                join(disjoint, linear(x, y+1, r, c), linear(x, y, r, c));
+            if(nextx >= 0 && nexty >= 0 && nextx < n && nexty < m+2) {
+                int nextval = max(best[currx][curry],v[nextx][nexty]);
+                if(nextval < best[nextx][nexty]) {
+                    best[nextx][nexty] = nextval;
+                    q.insert({nextval,nextx,nexty});
+                }
             }
         }
     }
 
-    cout << depth << endl;
+    cout << best[0][m+1] << endl;
 }
