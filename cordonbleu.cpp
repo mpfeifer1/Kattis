@@ -2,70 +2,90 @@
 
 using namespace std;
 typedef long long ll;
-const ll inf = (ll)1 << 60;
 
-struct edge {
-	ll b, u, c, f;
-	size_t back;
-};
+//jobs X workers cost matrix
+//cost[i][j] is cost of job i done by worker j
+//#jobs must be <= #workers
+//Default finds max cost; to find min cost set all costs[i][j] to -costs[i][j]
+//Adapted from the judges solution to cordonbleu from SWERC 2017
+ll HungarianMatch(const vector<vector<ll>>& costs)
+{
+    ll nx = costs.size();
+    ll ny = costs[0].size();
 
-void addedge(vector<vector<edge>>& g, ll a, ll b, ll u, ll c) {
-	edge r1 = {b,u,c,0,g[b].size()};
-	edge r2 = {a,0,-c,0,g[a].size()};
-	g[a].push_back(r1);
-	g[b].push_back(r2);
-}
+    vector<ll> xy(nx, -1), yx(ny, -1), lx(nx), ly(ny, 0), augmenting(ny);
+    vector<bool> s(nx);
+    vector<pair<ll, ll>> slack(ny, make_pair(0, 0));
 
-ll n, m, k = inf;
+    for (ll x = 0; x < nx; x++)
+    {
+        ll& lxx = lx[x];
+        lxx = costs[x][0];
+        for(const ll& i : costs[x])
+            lxx = max(lxx, i);
+    }
 
-pair<ll,ll> mincostflow(vector<vector<edge>>& g, ll s, ll t) {
-	ll flow = 0,  cost = 0;
-	while(flow < k) {
-		vector<ll> id(n, 0);
-		vector<ll> d(n, inf);
-		vector<ll> q(n);
-		vector<ll> p(n);
-		vector<size_t> p_edge(n);
-		ll qh=0, qt=0;
-		q[qt++] = s;
-		d[s] = 0;
-		while(qh != qt) {
-			ll v = q[qh++];
-			id[v] = 2;
-			if(qh == n)  qh = 0;
-			for(size_t i=0; i<g[v].size(); ++i) {
-				edge& r = g[v][i];
-				if(r.f < r.u && d[v] + r.c < d[r.b]) {
-					d[r.b] = d[v] + r.c;
-					if(id[r.b] == 0) {
-						q[qt++] = r.b;
-						if(qt == n) qt = 0;
-					}
-					else if(id[r.b] == 2) {
-						if(--qh == -1) qh = n-1;
-						q[qh] = r.b;
-					}
-					id[r.b] = 1;
-					p[r.b] = v;
-					p_edge[r.b] = i;
-				}
-			}
-		}
-		if(d[t] == inf) break;
-		ll addflow = k - flow;
-		for(ll v=t; v!=s; v=p[v]) {
-			ll pv = p[v]; size_t pr = p_edge[v];
-			addflow = min(addflow, g[pv][pr].u - g[pv][pr].f);
-		}
-		for(ll v=t; v!=s; v=p[v]) {
-			ll pv = p[v]; size_t pr = p_edge[v], r = g[pv][pr].back;
-			g[pv][pr].f += addflow;
-			g[v][r].f -= addflow;
-			cost += g[pv][pr].c * addflow;
-		}
-		flow += addflow;
-	}
-    return {flow,cost};
+    for (ll root = 0; root < nx; root++) {
+        fill(augmenting.begin(), augmenting.end(), -1);
+        fill(s.begin(), s.end(), false);
+
+        s[root] = true;
+        auto lxroot = lx[root]; auto criter = costs[root].begin();
+        auto lyiter = ly.begin(); auto sliter = slack.begin();
+        for (ll y = 0; y < ny; y++, criter++, lyiter++, sliter++)
+        *sliter = make_pair(lxroot + *lyiter - *criter, root);
+
+        ll y = -1;
+        for (;;) {
+        ll delta = numeric_limits<ll>::max(), x = -1;
+        auto aiter = augmenting.begin(); auto sliter = slack.begin();
+        for (ll yy = 0; yy < ny; yy++, aiter++, sliter++)
+            if (*aiter == -1 && sliter -> first < delta) {
+                delta = sliter->first;
+                x = sliter->second;
+                y = yy;
+            }
+
+        if (delta > 0) {
+            auto siter = s.begin(); auto lxiter = lx.begin();
+            for (ll x = 0; x < nx; x++, siter++, lxiter++)
+                if (*siter)
+                    *lxiter -= delta;
+
+            aiter = augmenting.begin(); lyiter = ly.begin(); sliter = slack.begin();
+            for (ll y = 0; y < ny; y++, lyiter++, aiter++, sliter++)
+                if (*aiter > -1)
+                    *lyiter += delta;
+                else
+                    sliter->first -= delta;
+        }
+
+        augmenting[y] = x;
+        x = yx[y];
+        if (x == -1)
+            break;
+        s[x] = true;
+
+        aiter = augmenting.begin(); sliter = slack.begin();
+        auto lxx = lx[x]; lyiter = ly.begin();
+        auto cxiter = costs[x].begin();
+        for (ll y = 0; y < ny; y++, aiter++, sliter++, lyiter++, cxiter++)
+            if (*aiter == -1) {
+                pair<ll, ll> alt = make_pair(lxx + *lyiter - *cxiter, x);
+                if (sliter->first > alt.first)
+                    *sliter = alt;
+                }
+            }
+
+        while (y > -1) {
+            int x = augmenting[y];
+            int prec = xy[x];
+            yx[y] = x;
+            xy[x] = y;
+            y = prec;
+        }
+    }
+    return -(accumulate(lx.cbegin(), lx.cend(), 0) + accumulate(ly.cbegin(), ly.cend(), 0));
 }
 
 ll dist(pair<ll,ll>& p1, pair<ll,ll>& p2) {
@@ -89,47 +109,27 @@ int main(){
     pair<ll,ll> restaraunt;
     cin >> restaraunt.first >> restaraunt.second;
 
-    ll sz = n + n+m-1 +2;
-    ::n = sz;
-    ::m = sz;
-
-	vector<vector<edge>> g(::n);
-
-    ll s = sz - 1;
-    ll t = sz - 2;
-
-    // Connect source to each bottle
-    for(ll i = 0; i < n; i++) {
-        addedge(g,s,i,1,0);
-    }
-
-    // Connect each courier to the sink
-    for(ll j = 0; j < n+m-1; j++) {
-        ll a = j+n;
-        addedge(g,a,t,1,0);
-    }
+    vector<vector<ll>> costs;
+    costs.resize(n,vector<ll>(n+m-1));
 
     // For each bottle
     for(ll i = 0; i < n; i++) {
         // For each courier
         for(ll j = 0; j < n+m-1; j++) {
             ll a = j + n;
+            ll costhere = 0;
             // Actual courier
             if(j < m) {
-                ll costhere = 0;
                 costhere += dist(bottles[i],couriers[j]);
                 costhere += dist(bottles[i],restaraunt);
-                addedge(g,i,a,1,costhere);
             }
             // Restaraunt and back
             else {
-                ll costhere = 0;
                 costhere += 2 * dist(bottles[i],restaraunt);
-                addedge(g,i,a,1,costhere);
             }
+            costs[i][j] = -costhere;
         }
     }
 
-    pair<ll,ll> p1 = mincostflow(g, s, t);
-    cout << p1.second << endl;
+    cout << HungarianMatch(costs) << endl;
 }
