@@ -2,7 +2,6 @@
 
 using namespace std;
 typedef long long ll;
-ll inf = (ll)1 << 60;
 
 // this is one-indexed
 // jobs X workers cost matrix
