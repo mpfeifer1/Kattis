@@ -3,94 +3,58 @@
 using namespace std;
 typedef long long ll;
 
-//jobs X workers cost matrix
-//cost[i][j] is cost of job i done by worker j
-//#jobs must be <= #workers
-//Default finds max cost; to find min cost set all costs[i][j] to -costs[i][j]
-//Adapted from the judges solution to cordonbleu from SWERC 2017
-ll HungarianMatch(const vector<vector<ll>>& costs)
-{
-    ll nx = costs.size();
-    ll ny = costs[0].size();
-
-    vector<ll> xy(nx, -1), yx(ny, -1), lx(nx), ly(ny, 0), augmenting(ny);
-    vector<bool> s(nx);
-    vector<pair<ll, ll>> slack(ny, make_pair(0, 0));
-
-    for (ll x = 0; x < nx; x++)
-    {
-        ll& lxx = lx[x];
-        lxx = costs[x][0];
-        for(const ll& i : costs[x])
-            lxx = max(lxx, i);
-    }
-
-    for (ll root = 0; root < nx; root++) {
-        fill(augmenting.begin(), augmenting.end(), -1);
-        fill(s.begin(), s.end(), false);
-
-        s[root] = true;
-        auto lxroot = lx[root]; auto criter = costs[root].begin();
-        auto lyiter = ly.begin(); auto sliter = slack.begin();
-        for (ll y = 0; y < ny; y++, criter++, lyiter++, sliter++)
-        *sliter = make_pair(lxroot + *lyiter - *criter, root);
-
-        ll y = -1;
-        for (;;) {
-        ll delta = numeric_limits<ll>::max(), x = -1;
-        auto aiter = augmenting.begin(); auto sliter = slack.begin();
-        for (ll yy = 0; yy < ny; yy++, aiter++, sliter++)
-            if (*aiter == -1 && sliter -> first < delta) {
-                delta = sliter->first;
-                x = sliter->second;
-                y = yy;
-            }
-
-        if (delta > 0) {
-            auto siter = s.begin(); auto lxiter = lx.begin();
-            for (ll x = 0; x < nx; x++, siter++, lxiter++)
-                if (*siter)
-                    *lxiter -= delta;
-
-            aiter = augmenting.begin(); lyiter = ly.begin(); sliter = slack.begin();
-            for (ll y = 0; y < ny; y++, lyiter++, aiter++, sliter++)
-                if (*aiter > -1)
-                    *lyiter += delta;
-                else
-                    sliter->first -= delta;
-        }
-
-        augmenting[y] = x;
-        x = yx[y];
-        if (x == -1)
-            break;
-        s[x] = true;
-
-        aiter = augmenting.begin(); sliter = slack.begin();
-        auto lxx = lx[x]; lyiter = ly.begin();
-        auto cxiter = costs[x].begin();
-        for (ll y = 0; y < ny; y++, aiter++, sliter++, lyiter++, cxiter++)
-            if (*aiter == -1) {
-                pair<ll, ll> alt = make_pair(lxx + *lyiter - *cxiter, x);
-                if (sliter->first > alt.first)
-                    *sliter = alt;
+// this is one-indexed
+// jobs X workers cost matrix
+// cost[i][j] is cost of job i done by worker j
+// #jobs must be <= #workers
+// Default finds min cost; to find max cost set all costs[i][j] to -costs[i][j]
+ll HungarianMatch(const vector<vector<ll>>& a) {
+    ll n = a.size()-1;
+    ll m = a[0].size()-1;
+    vector<ll> u(n+1), v(m+1), p(m+1), way(m+1);
+    for(ll i = 1; i <= n; ++i) {
+        p[0] = i;
+        ll j0 = 0;
+        vector<ll> minv(m+1, inf);
+        vector<char> used(m+1, false);
+        do {
+            used[j0] = true;
+            ll i0 = p[j0], delta = inf, j1;
+            for(ll j = 1; j <= m; ++j)
+                if(!used[j]) {
+                    ll cur = a[i0][j] - u[i0] - v[j];
+                    if(cur < minv[j])
+                        minv[j] = cur, way[j] = j0;
+                    if(minv[j] < delta)
+                        delta = minv[j], j1 = j;
                 }
-            }
-
-        while (y > -1) {
-            int x = augmenting[y];
-            int prec = xy[x];
-            yx[y] = x;
-            xy[x] = y;
-            y = prec;
-        }
+            for(ll j = 0; j <= m; ++j)
+                if(used[j])
+                    u[p[j]] += delta, v[j] -= delta;
+                else
+                    minv[j] -= delta;
+            j0 = j1;
+        } while(p[j0] != 0);
+        do {
+            ll j1 = way[j0];
+            p[j0] = p[j1];
+            j0 = j1;
+        } while(j0);
     }
-    return -(accumulate(lx.cbegin(), lx.cend(), 0) + accumulate(ly.cbegin(), ly.cend(), 0));
+
+    /*
+    // For each N, it contains the M it selected
+    vector<ll> ans(n+1);
+    for(ll j = 1; j <= m ; ++j)
+        ans[p[j]] = j;
+    */
+
+    return -v[0];
 }
 
 ll dist(pair<ll,ll>& p1, pair<ll,ll>& p2) {
     return abs(p1.first-p2.first) +
-           abs(p1.second-p2.second);
+        abs(p1.second-p2.second);
 }
 
 int main(){
@@ -110,24 +74,23 @@ int main(){
     cin >> restaraunt.first >> restaraunt.second;
 
     vector<vector<ll>> costs;
-    costs.resize(n,vector<ll>(n+m-1));
+    costs.resize(n+1,vector<ll>(n+m));
 
     // For each bottle
     for(ll i = 0; i < n; i++) {
         // For each courier
         for(ll j = 0; j < n+m-1; j++) {
-            ll a = j + n;
             ll costhere = 0;
             // Actual courier
             if(j < m) {
                 costhere += dist(bottles[i],couriers[j]);
                 costhere += dist(bottles[i],restaraunt);
             }
-            // Restaraunt and back
+            // Restaurant and back
             else {
                 costhere += 2 * dist(bottles[i],restaraunt);
             }
-            costs[i][j] = -costhere;
+            costs[i+1][j+1] = costhere;
         }
     }
 
