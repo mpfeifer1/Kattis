@@ -79,28 +79,44 @@ int main() {
     ll n;
     cin >> n;
 
+    // Count Zeros
     int zeroes = 0;
+
+    // Memory for FFT Arrays
     vector<ll> freq(200008,0);
     vector<ll> res;
+
+    // Keep input
     vector<ll> all;
+
+    // Input
     for(ll i = 0; i < n; i++) {
         ll t; cin >> t;
+        // Add "ADD" to all numbers so that there's no negatives
 	all.push_back(t+ADD);
+        // Frequency represents count of each unique number
         freq[t+ADD]++;
+        // Count zeros
         if(t == 0) zeroes++;
     }
 
+    // Multiply frequency by itself (represents frequency of unique numbers after adding
+    // all numbers to all other numbers
     mult(freq,freq,res);
 
+    // For each number, remove it added to itself (basically, don't allow i+i=k. only i+j=k)
     for(auto t : all) {
         res[t*2]--;
     }
 
+    // Answer - for each number in the input, add the number of ways
+    // we can add two numbers to get it
     ll ans = 0;
     for(auto t : all) {
         ans += res[t+ADD];
     }
 
+    // Remove the number of ways zeros can be added to all other numbers
     ans -= (ll)2 * zeroes * (n-1);
 
     cout << ans << endl;
