@@ -22,5 +22,5 @@ int main() {
     int sum = min(min(t, c), g) * 7;
     sum += pow(t, 2) + pow(g, 2) + pow(c, 2);
 
-    cout << sum << endl;
+    cout << sum << "\n";
 }
