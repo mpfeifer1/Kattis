@@ -5,56 +5,36 @@
 
 using namespace std;
 
-bool calculate(vector<vector<bool>>& graph, vector<string> v) {
-    if(v.size() <= 1) {
-        return true;
+bool addrules(vector<pair<int,int>>& rules, string& s1, string& s2) {
+    for(int i = 0; i < max(s1.size(), s2.size()); i++) {
+        if(i >= s1.size()) {
+            return true;
+        }
+        if(i >= s2.size()) {
+            return false;
+        }
+        if(s1[i] != s2[i]) {
+            rules.push_back({s1[i]-'a', s2[i]-'a'});
+            return true;
+        }
     }
+    return true;
+}
 
-    // Grab all the unique elements in order in the first column
-    vector<int> alphabet;
-    for(auto i : v) {
-        alphabet.push_back(i[0] - 'a');
+bool calculate(vector<vector<bool>>& graph, vector<string>& v) {
+
+    vector<pair<int,int>> rules;
+
+    for(int i = 0; i < v.size()-1; i++) {
+        if(!addrules(rules, v[i], v[i+1])) {
+            return false;
+        }
     }
-    auto it = unique(alphabet.begin(), alphabet.end());
-    alphabet.resize(distance(alphabet.begin(), it));
 
     // Add them to the graph
-    for(int i = 0; i < alphabet.size()-1; i++) {
-        for(int j = i+1; j < alphabet.size(); j++) {
-            int c1 = alphabet[j];
-            int c2 = alphabet[i];
-            graph[c1][c2] = true;
-            if(graph[c2][c1]) {
-                return false;
-            }
-        }
-    }
-
-    // Split the strings by first char, send them into the recursive call
-    vector<vector<string>> split;
-    vector<string> empty;
-    split.push_back(empty);
-    if(v[0].size() > 1) {
-        split[split.size()-1].push_back(v[0]);
-    }
-    for(int i = 1; i < v.size(); i++) {
-        if(v[i][0] != v[i-1][0]) {
-            split.push_back(empty);
-        }
-        if(v[i].size() > 1) {
-            split[split.size()-1].push_back(v[i]);
-        }
-    }
-
-    for(auto& i : split) {
-        for(auto& j : i) {
-            j.erase(0, 1);
-        }
-    }
-
-    for(auto i : split) {
-        bool success = calculate(graph, i);
-        if(!success) {
+    for(auto i : rules) {
+        graph[i.second][i.first] = true;
+        if(graph[i.first][i.second]) {
             return false;
         }
     }
